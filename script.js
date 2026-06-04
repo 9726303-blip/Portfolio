@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { key: "nav_projects", label: "Кнопка «Проекты»" },
         { key: "nav_collab", label: "Кнопка «Сотрудничество»" },
         { key: "nav_about", label: "Кнопка «Обо мне»" },
+        { key: "nav_socials", label: "Кнопка «Мои соцсети»" },
       ],
     },
     {
@@ -224,6 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Мои проекты",
       nav_about: "Обо мне",
       nav_collab: "Предложить сотрудничество",
+      nav_socials: "Мои соцсети",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "диджитал‑художник и аниматор.",
       gallery_title: "Галерея работ",
@@ -295,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Projects",
       nav_about: "About",
       nav_collab: "Collaborate",
+      nav_socials: "My socials",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "Digital artist & animator.",
       gallery_title: "Gallery",
@@ -366,6 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "프로젝트",
       nav_about: "소개",
       nav_collab: "협업 제안",
+      nav_socials: "내 소셜",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "디지털 아티스트 겸 애니메이터.",
       gallery_title: "갤러리",
@@ -437,6 +441,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Proyectos",
       nav_about: "Sobre mí",
       nav_collab: "Colaborar",
+      nav_socials: "Mis redes",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "Artista digital y animador.",
       gallery_title: "Galería",
@@ -508,6 +513,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "项目",
       nav_about: "关于我",
       nav_collab: "合作",
+      nav_socials: "我的社交",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "数字艺术家与动画师.",
       gallery_title: "作品集",
@@ -1018,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function populateAdminForm() {
-    if (!adminEditLang) adminEditLang = currentLanguage;
+    if (!adminEditLang) adminEditLang = "ru";
     renderAdminFilterEditor();
     renderAdminGalleryFilterSelectors();
     renderAdminGalleryList();
@@ -1136,7 +1142,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderAdminTextList() {
     if (!adminTextList) return;
-    if (!adminEditLang) adminEditLang = currentLanguage;
+    if (!adminEditLang) adminEditLang = "ru";
     if (adminTextLang) adminTextLang.value = adminEditLang;
     adminTextList.innerHTML = "";
     // Редактируем текст ВЫБРАННОГО в админке языка (а не текущего языка сайта).
@@ -1372,7 +1378,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Читаем из localStorage картинку поста по индексу (картинки храним отдельно из-за размера)
   function renderAdminProjectsList() {
     if (!adminProjectsList) return;
-    if (!adminEditLang) adminEditLang = currentLanguage;
+    if (!adminEditLang) adminEditLang = "ru";
     adminProjectsList.innerHTML = '';
     const posts = Array.isArray(projectsData) ? projectsData : [];
     posts.forEach((post, index) => {
@@ -2638,7 +2644,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (adminTextLang) {
     adminTextLang.addEventListener('change', () => {
       // Сохраним текущие правки текста и постов перед переключением языка
-      const editLang = adminEditLang || currentLanguage;
+      const editLang = adminEditLang || "ru";
       const updated = collectAdminTextOverrides();
       if (!customTextStore[editLang]) customTextStore[editLang] = {};
       Object.assign(customTextStore[editLang], updated);
@@ -2772,5 +2778,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // После выбора язык сохраняется в localStorage, и при следующих заходах плашки нет.
   if (!localStorage.getItem("siteLanguage")) {
     showLanguageModal();
+    // на первом заходе анимация запустится после выбора языка (в setLanguage)
+  } else {
+    // на повторных заходах плашки нет — запускаем анимацию заголовка сразу
+    playTitleEffects();
   }
 });

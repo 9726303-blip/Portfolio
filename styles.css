@@ -21,55 +21,88 @@
   --t-med: 0.32s;
 }
 
-/* ===== Светлая тема (по умолчанию) ===== */
+/* ===== Светлая тема (по умолчанию) =====
+   Палитра взята ТОЧНО из исходного файла палитра.jpg:
+     #513215 тёмно-коричневый · #A13808 кирпич · #E98E0C оранжевый · #F0BB51 янтарь */
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f5c56a;
-  --surface: #f2a30f;
-  --surface-strong: #bf3f0a;
-  --accent: #4f3216;
-  --accent-soft: #f7cf7d;
-  --text: #3b2c1e;
-  --text-soft: #5d4a37;
-  --shadow: 0 24px 80px rgba(88, 46, 17, 0.22);
+  --c-brown: #513215;
+  --c-brick: #a13808;
+  --c-orange: #e98e0c;
+  --c-amber: #f0bb51;
+
+  --bg: var(--c-amber);
+  --surface: var(--c-orange);
+  --surface-strong: var(--c-brick);
+  --accent: var(--c-brown);
+  --accent-soft: #f4cd7e;
+  --text: #3b2613;
+  --text-soft: #6b4e30;
+  --shadow: 0 24px 80px rgba(81, 50, 21, 0.24);
 
   /* Поверхности под 2026: стекло */
-  --card-bg: rgba(255, 243, 218, 0.78);
-  --card-border: rgba(255, 255, 255, 0.45);
+  --card-bg: rgba(255, 244, 222, 0.82);
+  --card-border: rgba(255, 255, 255, 0.5);
   --glass-blur: 16px;
-  /* Палитра как на референсах: СВЕРХУ насыщенный жёлтый → К НИЗУ тёмный оранжевый.
-     Градиент тянется по всей высоте страницы. */
-  --page-bg: linear-gradient(180deg, #f6c63f 0%, #f3b02a 30%, #ec8f22 62%, #df6f17 100%);
-  /* Жёлтый для пилюль-фильтров */
-  --filter-bg: #f7da6b;
-  --filter-bg-hover: #ffe585;
-  --field-bg: #fffaf3;
-  --field-border: rgba(112, 76, 34, 0.18);
-  --ring: rgba(214, 120, 38, 0.55);
+  /* СВЕРХУ тёпло-оранжевый → янтарь → оранжевый → тёмный оранжево-кирпичный К НИЗУ. */
+  --page-bg: linear-gradient(180deg,
+    #fad199 0%,
+    #efb544 18%,
+    #eca52f 48%,
+    #e2811a 76%,
+    #c25510 100%);
+  /* Жёлтые пилюли-фильтров — светлее и желтее */
+  --filter-bg: #fbe49a;
+  --filter-bg-hover: #ffefb0;
+  --field-bg: #fff7ea;
+  --field-border: rgba(112, 76, 34, 0.2);
+  --ring: rgba(233, 142, 12, 0.55);
 }
 
-/* ===== Тёмная тема ===== */
+/* ===== Тёмная тема ===== тёплая, тёмно-коричнево-оранжевая (та же палитра, темнее) */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1a120b;
-  --surface: #c97a1e;
-  --surface-strong: #e8893a;
-  --accent: #f4d8a8;
-  --accent-soft: #6b4519;
-  --text: #f6e7cf;
-  --text-soft: #d8c2a0;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --c-brown: #513215;
+  --c-brick: #a13808;
+  --c-orange: #e98e0c;
+  --c-amber: #f0bb51;
 
-  --card-bg: rgba(46, 32, 19, 0.66);
-  --card-border: rgba(244, 216, 168, 0.14);
+  --bg: #20140a;
+  --surface: #c2741a;
+  --surface-strong: #d96a1f;
+  --accent: #f4d8a8;
+  --accent-soft: #5a3a16;
+  --text: #f7e8cf;
+  --text-soft: #d8bf99;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+
+  --card-bg: rgba(54, 35, 18, 0.7);
+  --card-border: rgba(244, 216, 168, 0.16);
   --glass-blur: 18px;
-  --page-bg: radial-gradient(circle at top left, rgba(201, 122, 30, 0.22), transparent 32%),
-             radial-gradient(circle at bottom right, rgba(120, 60, 20, 0.3), transparent 30%),
-             linear-gradient(180deg, #241710 0%, #1a120b 45%, #120c07 100%);
-  --field-bg: rgba(28, 19, 11, 0.85);
-  --field-border: rgba(244, 216, 168, 0.18);
-  --ring: rgba(244, 184, 110, 0.6);
+  /* Сверху чуть теплее/светлее → к низу заметно темнее, без чёрного — тёплый коричневый. */
+  --page-bg: linear-gradient(180deg,
+    #3a2310 0%,
+    #2c1a0c 38%,
+    #20140a 72%,
+    #160d06 100%);
+  --filter-bg: rgba(201, 122, 30, 0.28);
+  --filter-bg-hover: rgba(233, 142, 12, 0.42);
+  --field-bg: rgba(34, 22, 12, 0.9);
+  --field-border: rgba(244, 216, 168, 0.2);
+  --ring: rgba(233, 142, 12, 0.6);
+}
+
+/* Тёмная тема: затемнение шапки СНИЗУ (как просили) — тёплый коричневый низ */
+[data-theme="dark"] .hero-section {
+  background: linear-gradient(180deg, #3a2310 0%, #2a1809 100%);
+}
+[data-theme="dark"] .hero-section::after {
+  background: linear-gradient(180deg,
+    rgba(40, 24, 10, 0.30) 0%,
+    rgba(40, 24, 10, 0.45) 40%,
+    rgba(28, 16, 8, 0.80) 78%,
+    rgba(22, 13, 6, 0.96) 100%);
 }
 
 * {
@@ -275,6 +308,13 @@ body {
   max-width: 100%;
   overflow-x: hidden;
 }
+/* Плавная прокрутка к якорям навигации (#order, #socials и т.д.) */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 
 .side-panel {
   position: fixed;
@@ -317,20 +357,20 @@ body {
   position: relative;
   padding: 40px 24px 60px;
   overflow: hidden;
-  background: linear-gradient(180deg, #fbe6b0 0%, #f7cf73 100%);
+  background: linear-gradient(180deg, #fbe6c2 0%, #f3c462 100%);
 }
 
-/* Тёплая вуаль поверх фоновой картинки шапки: лёгкая сверху и сильно затемняющая
-   К НИЗУ шапки (как на референсе) — низ переходит в жёлтый верх страницы. */
+/* Тёплая вуаль поверх картинки шапки: лёгкая бежевая сверху и сильно затемняющая
+   К НИЗУ ОРАНЖЕВЫМ (а не жёлтым) — плавно переходит в верх страницы. */
 .hero-section::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg,
-    rgba(251, 224, 150, 0.30) 0%,
-    rgba(244, 176, 42, 0.45) 45%,
-    rgba(231, 140, 30, 0.78) 80%,
-    rgba(246, 198, 63, 0.96) 100%);
+    rgba(251, 230, 194, 0.18) 0%,
+    rgba(240, 187, 81, 0.28) 42%,
+    rgba(233, 142, 12, 0.60) 78%,
+    rgba(194, 85, 16, 0.80) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -387,22 +427,22 @@ body {
 .hero-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: clamp(8px, 1.2vw, 14px);
   justify-content: center;
-  margin-bottom: 32px;
+  margin-bottom: clamp(20px, 3vw, 32px);
 }
 
+/* Кнопки навигации плавно уменьшаются вместе с окном (padding/шрифт через clamp) */
 .nav-button {
-  padding: 20px 32px;
-  color: #3b2c1e;
+  padding: clamp(11px, 1.4vw, 18px) clamp(16px, 2.4vw, 30px);
   text-decoration: none;
   border-radius: 999px;
-  background: rgba(183, 78, 18, 0.96);
-  box-shadow: 0 12px 26px rgba(88, 45, 17, 0.18);
+  background: rgba(161, 56, 8, 0.96);
+  box-shadow: 0 10px 22px rgba(88, 45, 17, 0.18);
   transition: transform 0.2s ease, background 0.2s ease;
-  font-size: 1.05rem;
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
   font-weight: 600;
-  min-width: 240px;
+  min-width: clamp(150px, 18vw, 230px);
   text-align: center;
   color: #f7e2b0;
 }
@@ -1034,7 +1074,8 @@ main {
 }
 
 .filter-button {
-  padding: 14px 18px;
+  padding: clamp(9px, 1.1vw, 14px) clamp(12px, 1.6vw, 18px);
+  font-size: clamp(0.85rem, 1vw, 0.98rem);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
   /* Жёлтые пилюли, как на референсе */
@@ -1060,9 +1101,9 @@ main {
 .floating-gallery {
   margin-top: 36px;
   display: grid;
-  gap: 18px;
-  /* Ровная сетка одинаковых ячеек */
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(10px, 1.4vw, 18px);
+  /* Ровная сетка одинаковых ячеек; ширина ячейки тянется с окном */
+  grid-template-columns: repeat(auto-fill, minmax(clamp(180px, 22vw, 240px), 1fr));
   overflow: hidden;
 }
 
@@ -1509,11 +1550,12 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 130px;
-  padding: 14px 20px;
+  min-width: clamp(100px, 12vw, 130px);
+  padding: clamp(10px, 1.3vw, 14px) clamp(14px, 2vw, 20px);
+  font-size: clamp(0.9rem, 1vw, 1rem);
   border-radius: 999px;
-  background: rgba(255, 217, 105, 0.96);
-  color: #3b2c1e;
+  background: var(--filter-bg);
+  color: #3b2613;
   text-decoration: none;
   font-weight: 600;
   transition: transform 0.2s ease, background 0.2s ease;
@@ -1608,14 +1650,11 @@ main {
     gap: 10px;
   }
 
-  /* Галерея — одна колонка, ниже карточки */
+  /* Галерея на телефоне — ДВЕ колонки, карточки меньше (соотношение 4:5 сохраняется) */
   .floating-gallery {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin-top: 24px;
-  }
-  .art-card {
-    min-height: 220px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 22px;
   }
 
   /* Карточки/секции — меньше внутренних отступов */
@@ -1941,7 +1980,8 @@ main {
 .cta-button {
   border: none;
   border-radius: var(--radius-pill);
-  padding: 15px 30px;
+  padding: clamp(12px, 1.5vw, 15px) clamp(20px, 3vw, 30px);
+  font-size: clamp(0.92rem, 1vw, 1rem);
   /* Тёмная часть градиента ближе к surface-strong — контраст для светлого текста */
   background: linear-gradient(135deg, var(--surface-strong) 0%, #8f2e07 100%);
   color: #fff7e9;
@@ -2277,6 +2317,26 @@ main {
   background: var(--field-bg);
   color: var(--text);
   font: inherit;
+}
+
+/* Верхний выбор языка в админке — выделенный */
+.admin-lang-top {
+  background: rgba(233, 142, 12, 0.12);
+  border: 1px solid rgba(233, 142, 12, 0.4);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.admin-lang-top select {
+  width: 100%;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  margin-top: 6px;
 }
 
 .admin-projects-list {

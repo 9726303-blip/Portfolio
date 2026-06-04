@@ -49,6 +49,7 @@
             <a href="#projects" class="nav-button" data-i18n="nav_projects">мои проекты</a>
             <a href="#collab" class="nav-button" data-i18n="nav_collab">предложить сотрудничество</a>
             <a href="#about" class="nav-button" data-i18n="nav_about">обо мне</a>
+            <a href="#socials" class="nav-button" data-i18n="nav_socials">мои соцсети</a>
           </nav>
 
           <div class="hero-utility">
@@ -234,7 +235,7 @@
       </section>
     </main>
 
-      <footer class="site-footer" aria-label="Контакты и социальные сети">
+      <footer class="site-footer" id="socials" aria-label="Контакты и социальные сети">
         <div class="footer-shell">
           <p class="footer-title" data-i18n="footer_title">Следуй за мной в соцсетях</p>
           <div class="social-links">
@@ -286,6 +287,18 @@
         <button class="admin-close" id="adminClose" aria-label="Закрыть админку">×</button>
       </div>
       <form id="adminForm">
+        <div class="admin-field admin-lang-top">
+          <label for="adminTextLang">🌐 Язык, который сейчас редактирую</label>
+          <select id="adminTextLang">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="ko">한국어</option>
+          </select>
+          <p class="admin-help">Выберите язык один раз — он применяется ко всему редактированию текста и подписям постов ниже. По умолчанию — русский.</p>
+        </div>
+
         <div class="admin-field">
           <label>Редактирование изображений</label>
           <div class="admin-image-section">
@@ -338,18 +351,8 @@
 
         <div class="admin-field">
           <label>Редактирование текста</label>
-          <div class="admin-lang-switch">
-            <label for="adminTextLang">Язык, который редактируем:</label>
-            <select id="adminTextLang">
-              <option value="ru">Русский</option>
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="zh">中文</option>
-              <option value="ko">한국어</option>
-            </select>
-          </div>
           <div id="adminTextList" class="admin-text-list"></div>
-          <p class="admin-help">Выберите язык вверху и впишите текст именно для него. Текст сохраняется отдельно для каждого языка — переключите язык, чтобы задать перевод. Если поле пустое, показывается стандартный текст.</p>
+          <p class="admin-help">Текст редактируется для языка, выбранного вверху панели. Сохраняется отдельно для каждого языка. Если поле пустое — показывается стандартный текст.</p>
         </div>
 
         <div class="admin-field">
