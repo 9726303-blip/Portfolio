@@ -168,17 +168,56 @@
         <div class="info-card info-card--projects">
           <h2 data-i18n="projects_title">Мои проекты</h2>
           <p data-i18n="projects_description">Здесь я рассказываю о проектах, в которых участвовал, и о том, над чем работал.</p>
-          <ul>
-            <li data-i18n="projects_item1">Проекты будут добавлены в ближайшее время.</li>
-          </ul>
+          <div class="projects-feed" id="projectsFeed" aria-label="Лента проектов"></div>
         </div>
       </section>
 
       <section class="info-section" id="collab">
-        <div class="info-card info-card--collab">
+        <div class="info-card info-card--collab info-card--order">
           <h2 data-i18n="collab_title">Предложить сотрудничество</h2>
           <p data-i18n="collab_p1">Ищу проекты, где можно добавить лёгкую магию с помощью диджитал-арта. Буду рада сделать работу для бренда, игры, издательства или кампании.</p>
           <p data-i18n="collab_p2">Оставь запрос, и я отвечу с предварительной идеей и примерными сроками.</p>
+
+          <form id="collabForm" class="order-form" aria-describedby="collabStatus">
+            <!-- Honeypot против ботов -->
+            <div class="order-hp" aria-hidden="true">
+              <label for="collabHp">Не заполняйте это поле</label>
+              <input id="collabHp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div class="order-grid">
+              <div class="order-field">
+                <label for="collabName" data-i18n="order_form_name">Имя / компания</label>
+                <input id="collabName" name="from_name" type="text" required autocomplete="name" />
+              </div>
+              <div class="order-field order-field--contact">
+                <label for="collabContact" data-i18n="order_form_contact_label">Как с вами связаться</label>
+                <div class="contact-input">
+                  <select id="collabContactMethod" name="contact_method" aria-label="Способ связи">
+                    <option value="email" data-i18n="order_form_contact_email">Email</option>
+                    <option value="discord" data-i18n="order_form_contact_discord">Discord</option>
+                    <option value="telegram" data-i18n="order_form_contact_telegram">Telegram</option>
+                  </select>
+                  <input id="collabContact" name="contact" type="text" required autocomplete="email" placeholder="you@example.com" />
+                </div>
+                <input id="collabReplyTo" name="reply_to" type="hidden" value="" />
+              </div>
+              <div class="order-field order-field--full">
+                <label for="collabMessage" data-i18n="collab_form_desc">Опишите предложение</label>
+                <textarea id="collabMessage" name="message" rows="5" required placeholder="Проект, формат сотрудничества, сроки, бюджет…"></textarea>
+              </div>
+            </div>
+
+            <label class="order-consent">
+              <input id="collabConsent" name="consent" type="checkbox" required />
+              <span data-i18n="order_form_consent">Согласен(на) на обработку данных для ответа на заявку</span>
+            </label>
+
+            <div class="order-actions">
+              <button type="submit" id="collabSubmit" class="cta-button" data-i18n="collab_form_submit">Отправить предложение</button>
+              <p class="order-status" id="collabStatus" role="status" aria-live="polite"></p>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -222,6 +261,7 @@
         <button class="language-button" data-lang="en">English</button>
         <button class="language-button" data-lang="es">Español</button>
         <button class="language-button" data-lang="zh">中文</button>
+        <button class="language-button" data-lang="ko">한국어</button>
       </div>
     </div>
   </div>
@@ -290,16 +330,32 @@
         </div>
 
         <div class="admin-field">
+          <label>Мои проекты (посты)</label>
+          <div id="adminProjectsList" class="admin-projects-list"></div>
+          <button type="button" id="adminAddProject" class="admin-button">Добавить пост</button>
+          <p class="admin-help">Каждый пост — картинка, подпись и дата. Подпись можно задавать на каждом языке отдельно (язык выбирается ниже, в разделе «Редактирование текста»). Дата ставится вручную.</p>
+        </div>
+
+        <div class="admin-field">
           <label>Редактирование текста</label>
+          <div class="admin-lang-switch">
+            <label for="adminTextLang">Язык, который редактируем:</label>
+            <select id="adminTextLang">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="zh">中文</option>
+              <option value="ko">한국어</option>
+            </select>
+          </div>
           <div id="adminTextList" class="admin-text-list"></div>
-          <p class="admin-help">Простой редактор: заголовок и основной текст для каждого раздела.</p>
+          <p class="admin-help">Выберите язык вверху и впишите текст именно для него. Текст сохраняется отдельно для каждого языка — переключите язык, чтобы задать перевод. Если поле пустое, показывается стандартный текст.</p>
         </div>
 
         <div class="admin-field">
           <label>Социальные сети</label>
           <div id="adminSocialLinks" class="admin-social-links"></div>
-          <button type="button" id="adminAddSocialLink" class="admin-button">Добавить социальную сеть</button>
-          <p class="admin-help">Добавляйте, редактируйте и удаляйте кнопки социальных сетей.</p>
+          <p class="admin-help">Меняйте название и ссылку для кнопок соцсетей в подвале.</p>
         </div>
 
         <div class="admin-field">
@@ -323,10 +379,41 @@
         </div>
 
         <div class="admin-field">
+          <label for="adminNtfyTopic">Push-уведомления о заявках (ntfy.sh)</label>
+          <input id="adminNtfyTopic" type="text" placeholder="Имя канала, напр. podvalnia-zayavki-7x9k" autocomplete="off" />
+          <p class="admin-help">Придумайте уникальное секретное имя канала и впишите сюда. Установите приложение <b>ntfy</b> (Android/iOS) или откройте <code>ntfy.sh</code> в браузере и подпишитесь на этот же канал. Каждая новая заявка будет приходить вам push-уведомлением. Имя держите в секрете — кто его знает, тот видит уведомления.</p>
+        </div>
+
+        <div class="admin-field">
           <label>Полученные заявки</label>
           <div id="adminOrdersList" class="admin-orders-list"></div>
           <button type="button" id="adminClearOrders" class="admin-button admin-button--secondary">Очистить заявки</button>
           <p class="admin-help">Заявки, сохранённые локально (когда EmailJS не настроен или письмо не ушло).</p>
+        </div>
+
+        <div class="admin-field">
+          <label>Опубликовать на сайт (для всех устройств)</label>
+          <div class="admin-publish">
+            <input id="adminGhOwner" type="text" placeholder="GitHub: владелец (напр. 9726303-blip)" autocomplete="off" />
+            <input id="adminGhRepo" type="text" placeholder="Репозиторий (напр. Portfolio)" autocomplete="off" />
+            <input id="adminGhBranch" type="text" placeholder="Ветка (обычно main)" autocomplete="off" />
+            <input id="adminGhToken" type="password" placeholder="GitHub-токен (хранится только тут)" autocomplete="off" />
+          </div>
+          <div class="admin-io-actions">
+            <button type="button" id="adminPublish" class="admin-button">Опубликовать сейчас</button>
+            <span id="adminPublishStatus" class="admin-publish-status" aria-live="polite"></span>
+          </div>
+          <p class="admin-help">Нажмите «Опубликовать сейчас» — весь контент (галерея, проекты, тексты, соцсети) выгрузится на GitHub в файл <code>content.json</code>, и сайт обновится для ВСЕХ за 1–2 минуты. Токен вводится один раз, хранится только в этом браузере и не попадает на сайт. Как создать токен — в инструкции (нужны права «Contents: write» для этого репозитория).</p>
+        </div>
+
+        <div class="admin-field">
+          <label>Резервная копия контента (файл)</label>
+          <div class="admin-io-actions">
+            <button type="button" id="adminExport" class="admin-button admin-button--secondary">Скачать копию</button>
+            <button type="button" id="adminImport" class="admin-button admin-button--secondary">Загрузить копию</button>
+            <input id="adminImportInput" type="file" accept="application/json,.json" class="hidden" />
+          </div>
+          <p class="admin-help">«Скачать копию» — сохранить весь контент в файл <code>content.json</code> на устройство (резерв или ручная заливка). «Загрузить копию» — вернуть контент из такого файла в админку.</p>
         </div>
 
         <div class="admin-field">
@@ -336,15 +423,25 @@
           <p class="admin-help">Оставьте пустым, чтобы не менять текущий пароль.</p>
         </div>
         <div class="admin-actions">
-          <button type="button" id="adminApply" class="admin-button">Применить изменения</button>
-          <button type="button" id="adminSave" class="admin-button">Сохранить</button>
-          <button type="button" id="adminReset" class="admin-button admin-button--secondary">Сбросить</button>
+          <button type="button" id="adminApply" class="admin-button">Применить (предпросмотр)</button>
+          <button type="button" id="adminSave" class="admin-button">Сохранить и закрыть</button>
+          <button type="button" id="adminReset" class="admin-button admin-button--secondary">Сбросить всё</button>
         </div>
+        <p class="admin-help" style="margin-top:4px">«Применить» — показать изменения на странице, не закрывая админку (для предпросмотра). «Сохранить и закрыть» — сохранить и закрыть панель. «Сбросить всё» — вернуть стандартный контент.</p>
       </form>
     </div>
   </div>
 
   <input id="adminGalleryFileInput" type="file" accept="image/*" class="hidden" />
+
+  <!-- Просмотр работы в полном размере (lightbox) -->
+  <div class="lightbox hidden" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр работы">
+    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Закрыть">×</button>
+    <div class="lightbox__stage">
+      <img id="lightboxImage" alt="" draggable="false" />
+      <div class="lightbox__watermark" id="lightboxWatermark" aria-hidden="true"></div>
+    </div>
+  </div>
 
   <!-- Уведомление о защите авторских прав -->
   <div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>

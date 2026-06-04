@@ -38,9 +38,12 @@
   --card-bg: rgba(255, 243, 218, 0.78);
   --card-border: rgba(255, 255, 255, 0.45);
   --glass-blur: 16px;
-  --page-bg: radial-gradient(circle at top left, rgba(247, 210, 121, 0.55), transparent 30%),
-             radial-gradient(circle at bottom right, rgba(171, 94, 39, 0.24), transparent 28%),
-             linear-gradient(180deg, #f5c56a 0%, #e09f3b 40%, #bf3f0a 100%);
+  /* Палитра как на референсах: СВЕРХУ насыщенный жёлтый → К НИЗУ тёмный оранжевый.
+     Градиент тянется по всей высоте страницы. */
+  --page-bg: linear-gradient(180deg, #f6c63f 0%, #f3b02a 30%, #ec8f22 62%, #df6f17 100%);
+  /* Жёлтый для пилюль-фильтров */
+  --filter-bg: #f7da6b;
+  --filter-bg-hover: #ffe585;
   --field-bg: #fffaf3;
   --field-border: rgba(112, 76, 34, 0.18);
   --ring: rgba(214, 120, 38, 0.55);
@@ -78,8 +81,12 @@ body {
   font-family: var(--font-body);
   font-size: clamp(1rem, 1.05vw, 1.08rem);
   line-height: 1.65;
+  /* Градиент тянется на всю высоту страницы и работает на мобильных
+     (без background-attachment: fixed — на телефонах он отключается и градиент «пропадает»). */
   background: var(--page-bg);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  min-height: 100vh;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -262,6 +269,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Глобальная защита от горизонтальной прокрутки (особенно на телефоне) */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .side-panel {
   position: fixed;
   top: 0;
@@ -303,14 +317,20 @@ body {
   position: relative;
   padding: 40px 24px 60px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 245, 215, 0.98), rgba(255, 239, 209, 0.99));
+  background: linear-gradient(180deg, #fbe6b0 0%, #f7cf73 100%);
 }
 
+/* Тёплая вуаль поверх фоновой картинки шапки: лёгкая сверху и сильно затемняющая
+   К НИЗУ шапки (как на референсе) — низ переходит в жёлтый верх страницы. */
 .hero-section::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(245, 206, 116, 0.58), rgba(242, 163, 45, 0.6) 38%, rgba(191, 63, 10, 0.55) 100%);
+  background: linear-gradient(180deg,
+    rgba(251, 224, 150, 0.30) 0%,
+    rgba(244, 176, 42, 0.45) 45%,
+    rgba(231, 140, 30, 0.78) 80%,
+    rgba(246, 198, 63, 0.96) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -1015,38 +1035,42 @@ main {
 
 .filter-button {
   padding: 14px 18px;
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
-  background: var(--card-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--text);
+  /* Жёлтые пилюли, как на референсе */
+  background: var(--filter-bg);
+  color: #4a3517;
   cursor: pointer;
+  font-weight: 600;
   transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
-  box-shadow: 0 12px 24px rgba(122, 68, 10, 0.12);
+  box-shadow: 0 10px 20px rgba(122, 68, 10, 0.14);
 }
 
 .filter-button:hover,
 .filter-button:focus-visible {
   transform: translateY(-2px);
-  background: rgba(255, 235, 150, 0.96);
+  background: var(--filter-bg-hover);
 }
 
 .filter-button.active {
-  background: rgba(214, 120, 38, 0.98);
-  color: #3b2c1e;
+  background: #c8521a;
+  color: #fff3df;
 }
 
 .floating-gallery {
   margin-top: 36px;
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* Ровная сетка одинаковых ячеек */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   overflow: hidden;
 }
 
+/* «Золотой стандарт» карточки: единый размер для всех работ.
+   Каждая карточка — фиксированное соотношение сторон 4:5, любое изображение
+   вписывается в него одинаково. Так разные по размеру арты не ломают сетку. */
 .art-card {
-  min-height: 240px;
+  aspect-ratio: 4 / 5;
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -1064,13 +1088,115 @@ main {
   box-shadow: 0 36px 90px rgba(88, 46, 17, 0.32);
 }
 
+/* Картинка заполняет карточку целиком, центрируется и аккуратно кадрируется.
+   Полную (необрезанную) версию показываем по клику в lightbox. */
 .art-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: transform var(--t-med) var(--ease);
 }
 
 .art-card:hover img {
   transform: scale(1.05);
 }
+
+/* Подсказка-зум при наведении */
+.art-card .art-zoom-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(20, 15, 10, 0.55);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+  pointer-events: none;
+}
+.art-card:hover .art-zoom-hint { opacity: 1; }
+.art-card .art-zoom-hint::before {
+  content: "⤢";
+  color: #fff7e9;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ----- Lightbox: полноразмерный просмотр работы ----- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 10, 6, 0.92);
+  padding: 32px;
+  animation: langOverlayIn 0.25s var(--ease) both;
+}
+.lightbox__stage {
+  position: relative;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+}
+.lightbox__stage img {
+  max-width: 96vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  /* Защита: нельзя перетащить/выделить */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+/* Водяной знак поверх увеличенной работы */
+.lightbox__watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lightbox__watermark span {
+  font-family: var(--font-hand);
+  font-size: clamp(1.4rem, 4vw, 3rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  transform: rotate(-24deg);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.lightbox__close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5001;
+  transition: background var(--t-fast) var(--ease);
+}
+.lightbox__close:hover { background: rgba(255, 255, 255, 0.3); }
 
 @keyframes cardAppear {
   to {
@@ -1437,7 +1563,17 @@ main {
     padding: 24px 14px 40px;
   }
   .hero-title-wrap {
-    padding: 40px 8px 18px;
+    padding: 28px 8px 16px;
+  }
+  /* На телефоне ник может не влезть в одну строку — разрешаем перенос,
+     чтобы он не вылезал за край и не «съезжал». */
+  .hero-title {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.1;
+  }
+  .hero-subtitle {
+    font-size: clamp(1.05rem, 5.2vw, 1.6rem);
   }
 
   /* Навигация в одну колонку, кнопки на всю ширину, без огромного min-width */
@@ -1450,8 +1586,8 @@ main {
   .nav-button {
     min-width: 0;
     width: 100%;
-    padding: 15px 20px;
-    font-size: 1rem;
+    padding: 13px 16px;
+    font-size: 0.98rem;
   }
 
   /* Утилиты (язык / тема) — переносятся аккуратно */
@@ -1508,6 +1644,9 @@ main {
     padding: 12px;
     align-items: flex-start;
   }
+  .language-modal {
+    align-items: center;
+  }
   .language-modal__panel,
   .admin-modal__panel {
     padding: 18px;
@@ -1516,8 +1655,26 @@ main {
     overflow: auto;
     margin-top: 12px;
   }
+  .language-modal__panel {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0;
+  }
+  .language-modal__prompt {
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin-bottom: 18px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  /* Кнопки языков — сеткой 2×N, чтобы ничего не вылезало за край */
   .language-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+  .language-button {
+    width: 100%;
   }
 
   /* Футер */
@@ -1552,7 +1709,7 @@ main {
 /* На узких экранах ник может не влезать в одну строку — уменьшаем минимум */
 @media (max-width: 400px) {
   :root {
-    --fs-hero: clamp(1.05rem, 6.2vw, 3.6rem);
+    --fs-hero: clamp(1.5rem, 8.5vw, 2.4rem);
   }
   .hero-nav {
     margin-bottom: 18px;
@@ -2044,4 +2201,186 @@ main {
 }
 .admin-order__meta { color: #5d4a37; font-size: 0.85rem; }
 .admin-orders-empty { color: #5d4a37; font-style: italic; }
+
+/* =====================================================================
+   ПРОЕКТЫ (посты) на странице
+   ===================================================================== */
+.projects-feed {
+  display: grid;
+  gap: 20px;
+  margin-top: 20px;
+  text-align: left;
+}
+.project-post {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+  align-items: start;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: 0 10px 28px rgba(122, 68, 10, 0.12);
+}
+.project-post__media {
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.4);
+}
+.project-post__media img {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+.project-post__date {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--surface-strong);
+  margin-bottom: 6px;
+}
+[data-theme="dark"] .project-post__date { color: #ffb27a; }
+.project-post__caption {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.projects-empty {
+  margin: 0;
+  color: var(--text-soft);
+  font-style: italic;
+}
+@media (max-width: 620px) {
+  .project-post {
+    grid-template-columns: 1fr;
+  }
+  .project-post__media img { max-height: 260px; }
+}
+
+/* =====================================================================
+   АДМИНКА: новые блоки (язык текста, проекты, соцсети, экспорт/импорт)
+   ===================================================================== */
+.admin-lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.admin-lang-switch select {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.admin-projects-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.admin-project-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(112, 76, 34, 0.16);
+  border-radius: 16px;
+  background: #fff9f0;
+}
+[data-theme="dark"] .admin-project-row {
+  background: var(--card-bg);
+  border-color: var(--field-border);
+}
+.admin-project-media {
+  display: grid;
+  gap: 8px;
+  justify-items: stretch;
+}
+.admin-project-preview {
+  width: 120px;
+  height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(112, 76, 34, 0.08);
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+.admin-project-preview img { width: 100%; height: 100%; object-fit: cover; }
+.admin-project-fields { display: grid; gap: 6px; }
+.admin-project-fields label { font-weight: 700; font-size: 0.85rem; }
+.admin-project-fields input,
+.admin-project-fields textarea {
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+.admin-project-remove { align-self: start; }
+
+.admin-social-links { display: grid; gap: 8px; }
+.admin-social-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 1.4fr;
+  gap: 8px;
+  align-items: center;
+}
+.admin-social-row input {
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 9px 12px;
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+.admin-social-row input:disabled { opacity: 0.7; }
+
+.admin-io-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-publish {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.admin-publish input {
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+.admin-publish-status {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.admin-publish-status.is-info { color: var(--text-soft); }
+.admin-publish-status.is-success { color: #2f8a4a; }
+.admin-publish-status.is-error { color: #c0392b; }
+[data-theme="dark"] .admin-publish-status.is-success { color: #5fd98a; }
+[data-theme="dark"] .admin-publish-status.is-error { color: #ff8a80; }
+
+@media (max-width: 620px) {
+  .admin-project-row { grid-template-columns: 1fr; }
+  .admin-project-preview { width: 100%; height: 160px; }
+  .admin-social-row { grid-template-columns: 1fr; }
+}
 
