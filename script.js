@@ -50,7 +50,22 @@ document.addEventListener("DOMContentLoaded", function () {
   const heroWrap = document.querySelector(".hero-title-wrap");
   const bird = document.querySelector(".bird");
   const adminSocialLinks = document.getElementById("adminSocialLinks");
-  const adminAddSocialLink = document.getElementById("adminAddSocialLink");
+  const adminTextLang = document.getElementById("adminTextLang");
+  const adminProjectsList = document.getElementById("adminProjectsList");
+  const adminAddProject = document.getElementById("adminAddProject");
+  const adminExport = document.getElementById("adminExport");
+  const adminImport = document.getElementById("adminImport");
+  const adminImportInput = document.getElementById("adminImportInput");
+  const projectsFeed = document.getElementById("projectsFeed");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxWatermark = document.getElementById("lightboxWatermark");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  // Все поддерживаемые языки (один источник истины)
+  const SUPPORTED_LANGS = ["ru", "en", "es", "zh", "ko"];
+  // Язык, который сейчас редактируется в админке (по умолчанию — текущий язык сайта)
+  let adminEditLang = null;
 
   // Gallery data
   const defaultGalleryItems = [
@@ -72,6 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   let galleryItems = [];
+  // Посты раздела «Мои проекты»: [{ image, date, caption: {ru, en, ...} }]
+  let projectsData = [];
   let galleryStartIndex = 0;
   let galleryRotationTimer = null;
   let pendingHeaderImage = null;
@@ -95,63 +112,111 @@ document.addEventListener("DOMContentLoaded", function () {
     { key: "portrait", label: "портреты", primary: false },
   ];
 
-  const adminTextSections = [
+  // Полный редактор текста: каждая запись — отдельный ключ с подписью и типом поля.
+  // Здесь можно править ВЕСЬ текст сайта на каждом языке: навигацию, фильтры, формы и т.д.
+  // type: 'input' (одна строка) или 'area' (многострочное).
+  const adminTextGroups = [
+    {
+      section: "Кнопки навигации",
+      fields: [
+        { key: "nav_order", label: "Кнопка «Заказать»" },
+        { key: "nav_projects", label: "Кнопка «Проекты»" },
+        { key: "nav_collab", label: "Кнопка «Сотрудничество»" },
+        { key: "nav_about", label: "Кнопка «Обо мне»" },
+      ],
+    },
     {
       section: "Главный экран",
-      titleKey: "hero_title",
-      bodyKeys: ["hero_subtitle"],
+      fields: [
+        { key: "hero_title", label: "Ник (заголовок)" },
+        { key: "hero_subtitle", label: "Подпись под ником" },
+      ],
     },
     {
       section: "Галерея",
-      titleKey: "gallery_title",
-      bodyKeys: ["gallery_description", "gallery_empty"],
+      fields: [
+        { key: "gallery_title", label: "Заголовок" },
+        { key: "gallery_description", label: "Описание", type: "area" },
+        { key: "gallery_empty", label: "Текст при пустой галерее", type: "area" },
+      ],
     },
     {
-      section: "Заказ",
-      titleKey: "order_title",
-      bodyKeys: ["order_p1"],
+      section: "Фильтры (ярлыки)",
+      fields: [
+        { key: "filter_all", label: "Все" },
+        { key: "filter_sketch", label: "Скетчи" },
+        { key: "filter_art", label: "Полноценные арты" },
+        { key: "filter_meme", label: "Меме" },
+        { key: "filter_animation", label: "Анимации" },
+        { key: "filter_mono", label: "Ч/Б арты" },
+        { key: "filter_animals", label: "Животные" },
+        { key: "filter_concept", label: "Концепт-арты" },
+        { key: "filter_pixel", label: "Пиксель-арт" },
+        { key: "filter_fantasy", label: "Фэнтези" },
+        { key: "filter_portrait", label: "Портреты" },
+        { key: "filter_mode_label", label: "Подпись «Совпадение:»" },
+        { key: "filter_mode_any", label: "Режим «любой»" },
+        { key: "filter_mode_all", label: "Режим «все»" },
+        { key: "filter_clear", label: "Кнопка «Сбросить фильтры»" },
+      ],
     },
     {
-      section: "Сотрудничество",
-      titleKey: "collab_title",
-      bodyKeys: ["collab_p1", "collab_p2"],
+      section: "Блок «Заказать»",
+      fields: [
+        { key: "order_title", label: "Заголовок" },
+        { key: "order_p1", label: "Описание блока", type: "area" },
+        { key: "order_form_name", label: "Поле «Имя»" },
+        { key: "order_form_contact_label", label: "Поле «Как связаться»" },
+        { key: "order_form_type", label: "Поле «Тип работы»" },
+        { key: "order_form_type_any", label: "Вариант «Любой/уточним»" },
+        { key: "order_form_budget", label: "Поле «Бюджет»" },
+        { key: "order_form_deadline", label: "Поле «Срок»" },
+        { key: "order_form_desc", label: "Поле «Опишите идею»" },
+        { key: "order_form_consent", label: "Текст согласия", type: "area" },
+        { key: "order_form_submit", label: "Кнопка отправки" },
+        { key: "order_form_sending", label: "Статус «Отправляем…»" },
+        { key: "order_form_success", label: "Статус «Успех»", type: "area" },
+        { key: "order_form_error", label: "Статус «Ошибка»", type: "area" },
+        { key: "order_form_saved", label: "Статус «Сохранено»", type: "area" },
+      ],
     },
     {
-      section: "Обо мне",
-      titleKey: "about_title",
-      bodyKeys: ["about_p1", "about_li1", "about_li2", "about_li3"],
+      section: "Блок «Сотрудничество»",
+      fields: [
+        { key: "collab_title", label: "Заголовок" },
+        { key: "collab_p1", label: "Текст 1", type: "area" },
+        { key: "collab_p2", label: "Текст 2", type: "area" },
+        { key: "collab_form_desc", label: "Поле «Опишите предложение»" },
+        { key: "collab_form_submit", label: "Кнопка отправки" },
+      ],
     },
     {
       section: "Проекты",
-      titleKey: "projects_title",
-      bodyKeys: ["projects_description", "projects_item1"],
+      fields: [
+        { key: "projects_title", label: "Заголовок" },
+        { key: "projects_description", label: "Описание", type: "area" },
+        { key: "projects_item1", label: "Текст «постов пока нет»", type: "area" },
+      ],
+    },
+    {
+      section: "Обо мне",
+      fields: [
+        { key: "about_title", label: "Заголовок" },
+        { key: "about_p1", label: "Текст", type: "area" },
+        { key: "about_li1", label: "Пункт 1" },
+        { key: "about_li2", label: "Пункт 2" },
+        { key: "about_li3", label: "Пункт 3" },
+      ],
     },
     {
       section: "Футер",
-      titleKey: "footer_title",
-      bodyKeys: [],
+      fields: [
+        { key: "footer_title", label: "Заголовок футера" },
+        { key: "footer_copyright", label: "Копирайт", type: "area" },
+        { key: "copy_warning", label: "Текст защиты от копирования", type: "area" },
+      ],
     },
   ];
-
-  const adminTextFieldLabels = {
-    nav_order: "Кнопка заказа",
-    nav_projects: "Кнопка проектов",
-    nav_collab: "Кнопка сотрудничества",
-    nav_about: "Кнопка обо мне",
-    hero_subtitle: "Подзаголовок",
-    gallery_description: "Описание",
-    gallery_empty: "Текст при пустой галерее",
-    order_p1: "Текст блока заказа",
-    order_p2: "Дополнительный текст блока заказа",
-    collab_p1: "Текст блока сотрудничества",
-    collab_p2: "Дополнительный текст блока сотрудничества",
-    about_p1: "Текст блока обо мне",
-    about_li1: "Пункт 1",
-    about_li2: "Пункт 2",
-    about_li3: "Пункт 3",
-    projects_description: "Описание проектов",
-    projects_item1: "Пункт списка проектов",
-  };
 
   const translations = {
     ru: {
@@ -181,6 +246,9 @@ document.addEventListener("DOMContentLoaded", function () {
       collab_title: "Предложить сотрудничество",
       collab_p1: "Ищу проекты, где можно добавить лёгкую магию с помощью диджитал‑арта. Буду рада сделать работу для бренда, игры, издательства или кампании.",
       collab_p2: "Оставьте запрос — я отвечу с предварительной идеей и примерными сроками.",
+      collab_form_desc: "Опишите предложение",
+      collab_form_submit: "Отправить предложение",
+      collab_form_kind: "Сотрудничество",
       about_title: "Обо мне",
       about_p1: "Я художник, работаю в цифровой живописи: люблю тёплые цвета, мягкое освещение и характерных персонажей.",
       about_li1: "Люблю лыжный спорт, макароны и лапшу.",
@@ -249,6 +317,9 @@ document.addEventListener("DOMContentLoaded", function () {
       collab_title: "Propose a collaboration",
       collab_p1: "I'm open to projects where I can add a touch of magic with digital art — brands, games, publishers, or campaigns.",
       collab_p2: "Leave a request and I'll reply with an initial concept and estimated timeline.",
+      collab_form_desc: "Describe your proposal",
+      collab_form_submit: "Send proposal",
+      collab_form_kind: "Collaboration",
       about_title: "About me",
       about_p1: "I create warm-toned digital art combining organic patterns, soft lighting, and expressive characters.",
       about_li1: "Focus on atmosphere and charm",
@@ -317,6 +388,9 @@ document.addEventListener("DOMContentLoaded", function () {
       collab_title: "협업 제안",
       collab_p1: "디지털 아트로 은은한 마법을 더할 수 있는 프로젝트를 찾고 있습니다. 브랜드, 게임, 출판사, 캠페인 작업 환영합니다.",
       collab_p2: "요청을 남겨주시면 초안 아이디어와 예상 일정을 회신드리겠습니다.",
+      collab_form_desc: "제안 내용을 적어주세요",
+      collab_form_submit: "제안 보내기",
+      collab_form_kind: "협업",
       about_title: "소개",
       about_p1: "유기적인 패턴, 부드러운 조명, 감성적인 캐릭터를 결합한 따뜻한 톤의 디지털 아트를 제작합니다.",
       about_li1: "분위기와 온기에 중점",
@@ -385,6 +459,9 @@ document.addEventListener("DOMContentLoaded", function () {
       collab_title: "Proponer colaboración",
       collab_p1: "Estoy abierta a proyectos donde pueda aportar un toque de magia con arte digital: marcas, juegos, editoriales o campañas.",
       collab_p2: "Deja una solicitud y te responderé con una idea inicial y plazos estimados.",
+      collab_form_desc: "Describe tu propuesta",
+      collab_form_submit: "Enviar propuesta",
+      collab_form_kind: "Colaboración",
       about_title: "Sobre mí",
       about_p1: "Creo arte digital en tonos cálidos combinando patrones orgánicos, iluminación suave y personajes expresivos.",
       about_li1: "Enfoque en atmósfera y ternura",
@@ -453,6 +530,9 @@ document.addEventListener("DOMContentLoaded", function () {
       collab_title: "提出合作",
       collab_p1: "我希望参与可以用数字艺术加入微妙魔法的项目，欢迎品牌、游戏、出版或活动的合作.",
       collab_p2: "留下请求，我会回复初步构想和预计时间.",
+      collab_form_desc: "描述你的合作提案",
+      collab_form_submit: "发送提案",
+      collab_form_kind: "合作",
       about_title: "关于我",
       about_p1: "我以温暖色调创作数字作品，结合有机图案、柔和光线和富有表现力的角色.",
       about_li1: "注重氛围与温度",
@@ -500,14 +580,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const customTextStore = JSON.parse(localStorage.getItem("customTexts") || "{}");
 
   // Translation functions
+  // Пустые строки в кастомных переводах считаем «не задано» и падаем на стандартный текст —
+  // чтобы случайно очищенное поле в админке не прятало кнопку/подпись.
   function getText(key) {
     const languageTexts = customTextStore[currentLanguage] || {};
     const translationText = translations[currentLanguage]?.[key];
     const russianCustom = customTextStore.ru?.[key];
-    
-    if (languageTexts[key] !== undefined) return languageTexts[key];
+
+    if (languageTexts[key]) return languageTexts[key];
     if (translationText !== undefined) return translationText;
-    if (russianCustom !== undefined) return russianCustom;
+    if (russianCustom) return russianCustom;
     if (translations.ru?.[key]) return translations.ru[key];
     return "";
   }
@@ -527,6 +609,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try { renderSocialLinks(); } catch (e) { console.error('social render error', e); }
     try { populateOrderTypeSelect(); } catch (e) { console.error('order select error', e); }
     try { updateContactFieldUI(); } catch (e) { console.error('contact field error', e); }
+    try { renderProjectsFeed(); } catch (e) { console.error('projects feed error', e); }
   }
 
   // Лениво подгружаем CJK/корейские шрифты только при выборе zh/ko (они тяжёлые).
@@ -652,15 +735,47 @@ document.addEventListener("DOMContentLoaded", function () {
           card.appendChild(watermark);
         }
 
-        // Прозрачный оверлей — перехватывает правый клик/перетаскивание изображения
+        // Иконка-подсказка «развернуть»
+        const hint = document.createElement("div");
+        hint.className = "art-zoom-hint";
+        card.appendChild(hint);
+
+        // Прозрачный оверлей — перехватывает правый клик/перетаскивание изображения,
+        // а по обычному клику открывает полноразмерный просмотр (lightbox).
         const guard = document.createElement("div");
         guard.className = "art-guard";
+        guard.addEventListener("click", () => openLightbox(item.image, item.alt || ""));
         card.appendChild(guard);
+        card.style.cursor = "zoom-in";
       } else {
         card.classList.add("art-card--placeholder");
       }
       galleryContainer.appendChild(card);
     }
+  }
+
+  // Lightbox: открыть работу в полном размере (с водяным знаком, если включён)
+  function openLightbox(src, alt) {
+    if (!lightbox || !lightboxImage || !src) return;
+    lightboxImage.src = src;
+    lightboxImage.alt = alt || "";
+    if (lightboxWatermark) {
+      const wm = loadWatermarkSettings();
+      lightboxWatermark.innerHTML = "";
+      if (wm.enabled) {
+        const span = document.createElement("span");
+        span.textContent = wm.text || getText("hero_title") || "Podvalnia_alebarda";
+        lightboxWatermark.appendChild(span);
+      }
+    }
+    lightbox.classList.remove("hidden");
+    document.body.style.overflow = "hidden"; // не скроллить фон
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add("hidden");
+    if (lightboxImage) lightboxImage.src = "";
+    document.body.style.overflow = "";
   }
 
   function getSelectedFilters() {
@@ -903,16 +1018,21 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function populateAdminForm() {
+    if (!adminEditLang) adminEditLang = currentLanguage;
     renderAdminFilterEditor();
     renderAdminGalleryFilterSelectors();
     renderAdminGalleryList();
     renderAdminTextList();
+    renderAdminProjectsList();
     populateEmailjsFields();
     populateWatermarkFields();
     renderAdminOrders();
+    populateGhFields();
   }
 
-  function saveAdminSettings() {
+  // closePanel=true → «Сохранить и закрыть»; false → «Применить (предпросмотр)».
+  // В обоих случаях изменения пишутся в localStorage и сразу видны на странице.
+  function saveAdminSettings(closePanel) {
     const filters = collectAdminFilterSettings();
     const oldFilters = loadFilterSettings();
     const oldFilterKeys = new Set(oldFilters.map((f) => f.key));
@@ -934,20 +1054,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     localStorage.setItem("galleryItems", JSON.stringify(galleryItems));
 
+    // Тексты сохраняем ТОЛЬКО для выбранного в админке языка (adminEditLang),
+    // чтобы можно было задать перевод отдельно для каждого языка.
+    const editLang = adminEditLang || currentLanguage;
     const updatedText = collectAdminTextOverrides();
     const existingCustom = JSON.parse(localStorage.getItem("customTexts") || "{}");
-    
-    const allLanguages = ['ru', 'en', 'ko', 'es', 'zh'];
-    allLanguages.forEach((lang) => {
-      if (!existingCustom[lang]) existingCustom[lang] = {};
-      Object.assign(existingCustom[lang], updatedText);
-    });
-    
+    if (!existingCustom[editLang]) existingCustom[editLang] = {};
+    Object.assign(existingCustom[editLang], updatedText);
+
+    // Ярлыки фильтров: ярлык из редактора фильтров — это базовый вариант. Для языков,
+    // где ярлык ещё не задан (ни в тексте, ни в стандартном переводе), подставляем его,
+    // чтобы фильтр не оставался без подписи. Если пользователь задал свой перевод ярлыка
+    // в редакторе текста (updatedText) — он уже в existingCustom[editLang] и НЕ перетирается.
     filters.forEach((filter) => {
       const filterKey = `filter_${filter.key}`;
-      allLanguages.forEach((lang) => {
+      SUPPORTED_LANGS.forEach((lang) => {
         if (!existingCustom[lang]) existingCustom[lang] = {};
-        existingCustom[lang][filterKey] = filter.label;
+        const alreadyHasOwn = existingCustom[lang][filterKey] && existingCustom[lang][filterKey].trim();
+        const hasBuiltin = translations[lang] && translations[lang][filterKey];
+        if (!alreadyHasOwn && !hasBuiltin) {
+          existingCustom[lang][filterKey] = filter.label;
+        }
       });
     });
 
@@ -969,6 +1096,12 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem('socialLinks', JSON.stringify(social));
     } catch (e) { console.warn('save social links failed', e); }
 
+    // Проекты (посты)
+    try {
+      projectsData = collectAdminProjects();
+      localStorage.setItem('projects', JSON.stringify(projectsData));
+    } catch (e) { console.warn('save projects failed', e); }
+
     try { saveEmailjsConfig(); } catch (e) { console.warn('save emailjs config failed', e); }
     try { saveWatermarkSettings(); } catch (e) { console.warn('save watermark failed', e); }
 
@@ -978,65 +1111,40 @@ document.addEventListener("DOMContentLoaded", function () {
     resetGalleryRotation();
     applyTranslations();
     renderSocialLinks();
-    closeAdminPanel();
+    renderProjectsFeed();
+    if (closePanel) {
+      closeAdminPanel();
+    } else {
+      // предпросмотр: перерисуем редакторы, чтобы значения были консистентны
+      renderAdminTextList();
+      renderAdminProjectsList();
+    }
   }
 
+  // Собираем введённый текст: одно поле = один ключ. Пустое поле = ключ сбрасывается
+  // (тогда показывается стандартный перевод).
   function collectAdminTextOverrides() {
     if (!adminTextList) return {};
     const result = {};
-    Array.from(adminTextList.querySelectorAll("[data-text-key], [data-text-keys]")).forEach((field) => {
-      const keys = field.dataset.textKeys
-        ? field.dataset.textKeys.split("|").map((k) => k.trim()).filter(Boolean)
-        : field.dataset.textKey
-        ? [field.dataset.textKey]
-        : [];
-      const rawValue = field.value.trim();
-      if (!keys.length) return;
-      if (!rawValue) {
-        keys.forEach((key) => {
-          result[key] = "";
-        });
-        return;
-      }
-
-      if (keys.length === 1) {
-        result[keys[0]] = rawValue;
-        return;
-      }
-
-      const paragraphs = rawValue
-        .split(/\n{2,}/)
-        .map((part) => part.trim())
-        .filter(Boolean);
-
-      if (paragraphs.length >= keys.length) {
-        keys.slice(0, -1).forEach((key, index) => {
-          result[key] = paragraphs[index] || "";
-        });
-        result[keys[keys.length - 1]] = paragraphs.slice(keys.length - 1).join("\n\n") || "";
-      } else {
-        const lines = rawValue
-          .split(/\n/)
-          .map((part) => part.trim())
-          .filter(Boolean);
-        if (lines.length >= keys.length) {
-          keys.forEach((key, index) => {
-            result[key] = lines[index] || "";
-          });
-        } else {
-          result[keys[0]] = rawValue;
-        }
-      }
+    Array.from(adminTextList.querySelectorAll("[data-text-key]")).forEach((field) => {
+      const key = field.dataset.textKey;
+      if (!key) return;
+      result[key] = field.value.trim();
     });
     return result;
   }
 
   function renderAdminTextList() {
     if (!adminTextList) return;
+    if (!adminEditLang) adminEditLang = currentLanguage;
+    if (adminTextLang) adminTextLang.value = adminEditLang;
     adminTextList.innerHTML = "";
-    const currentCustom = customTextStore[currentLanguage] || {};
+    // Редактируем текст ВЫБРАННОГО в админке языка (а не текущего языка сайта).
+    const editLang = adminEditLang;
+    const currentCustom = customTextStore[editLang] || {};
+    const langTr = translations[editLang] || {};
 
-    adminTextSections.forEach(({ section, titleKey, bodyKeys }) => {
+    adminTextGroups.forEach(({ section, fields }) => {
       const sectionWrap = document.createElement("div");
       sectionWrap.className = "admin-text-section";
 
@@ -1045,49 +1153,32 @@ document.addEventListener("DOMContentLoaded", function () {
       sectionTitle.textContent = section;
       sectionWrap.appendChild(sectionTitle);
 
-      if (titleKey) {
-        const titleRow = document.createElement("div");
-        titleRow.className = "admin-text-row";
-        const titleLabel = document.createElement("label");
-        titleLabel.textContent = "Заголовок";
-        titleLabel.htmlFor = `adminTextField_${titleKey}`;
-        const titleField = document.createElement("input");
-        titleField.id = `adminTextField_${titleKey}`;
-        titleField.type = "text";
-        titleField.dataset.textKey = titleKey;
-        titleField.value =
-          currentCustom[titleKey] ||
-          translations[currentLanguage][titleKey] ||
-          translations.ru[titleKey] ||
-          "";
-        titleField.className = "admin-text-field";
-        titleRow.appendChild(titleLabel);
-        titleRow.appendChild(titleField);
-        sectionWrap.appendChild(titleRow);
-      }
-
-      if (bodyKeys && bodyKeys.length) {
-        const bodyRow = document.createElement("div");
-        bodyRow.className = "admin-text-row";
-        const bodyLabel = document.createElement("label");
-        bodyLabel.textContent = "Основной текст";
-        bodyLabel.htmlFor = `adminTextField_${bodyKeys[0]}`;
-        const bodyField = document.createElement("textarea");
-        bodyField.id = `adminTextField_${bodyKeys[0]}`;
-        bodyField.dataset.textKeys = bodyKeys.join("|");
-        bodyField.rows = 6;
-        bodyField.className = "admin-text-field";
-        bodyField.value = bodyKeys
-          .map(
-            (key) =>
-              currentCustom[key] || translations[currentLanguage][key] || translations.ru[key] || ""
-          )
-          .filter(Boolean)
-          .join("\n\n");
-        bodyRow.appendChild(bodyLabel);
-        bodyRow.appendChild(bodyField);
-        sectionWrap.appendChild(bodyRow);
-      }
+      fields.forEach(({ key, label, type }) => {
+        const row = document.createElement("div");
+        row.className = "admin-text-row";
+        const lab = document.createElement("label");
+        lab.textContent = label;
+        lab.htmlFor = `adminTextField_${key}`;
+        // Текущее значение: своё (если задано) → стандартный перевод языка → русский
+        const value = (currentCustom[key] !== undefined && currentCustom[key] !== "")
+          ? currentCustom[key]
+          : (langTr[key] || translations.ru[key] || "");
+        let field;
+        if (type === "area") {
+          field = document.createElement("textarea");
+          field.rows = 3;
+        } else {
+          field = document.createElement("input");
+          field.type = "text";
+        }
+        field.id = `adminTextField_${key}`;
+        field.dataset.textKey = key;
+        field.className = "admin-text-field";
+        field.value = value;
+        row.appendChild(lab);
+        row.appendChild(field);
+        sectionWrap.appendChild(row);
+      });
 
       adminTextList.appendChild(sectionWrap);
     });
@@ -1152,44 +1243,27 @@ document.addEventListener("DOMContentLoaded", function () {
     Object.keys(links).forEach((key) => {
       const row = document.createElement('div');
       row.className = 'admin-social-row';
-      row.style.display = 'flex';
-      row.style.gap = '8px';
-      row.style.marginBottom = '8px';
-      row.style.alignItems = 'center';
-      
+
       const keyInput = document.createElement('input');
       keyInput.type = 'text';
-      keyInput.value = key;
+      keyInput.value = key.replace('social_', '');
       keyInput.disabled = true;
-      keyInput.style.width = '30%';
-      
+      keyInput.className = 'admin-social-key';
+      keyInput.dataset.socialKey = key;
+
       const labelInput = document.createElement('input');
       labelInput.type = 'text';
       labelInput.placeholder = 'Название кнопки';
       labelInput.value = links[key].label || getText(key) || '';
-      labelInput.dataset.socialKey = key;
-      labelInput.style.width = '50%';
-      labelInput.addEventListener('change', () => {
-        links[key].label = labelInput.value.trim() || getText(key) || key.replace('social_', '');
-        localStorage.setItem('socialLinks', JSON.stringify(links));
-        renderSocialLinks();
-      });
-      
-      const rm = document.createElement('button');
-      rm.type = 'button';
-      rm.textContent = 'Удалить';
-      rm.className = 'admin-button admin-button--secondary';
-      rm.style.width = '70px';
-      rm.addEventListener('click', () => {
-        delete links[key];
-        localStorage.setItem('socialLinks', JSON.stringify(links));
-        renderAdminSocialList();
-        renderSocialLinks();
-      });
-      
+
+      const urlInput = document.createElement('input');
+      urlInput.type = 'text';
+      urlInput.placeholder = 'Ссылка (https://…)';
+      urlInput.value = links[key].url && links[key].url !== '#' ? links[key].url : '';
+
       row.appendChild(keyInput);
       row.appendChild(labelInput);
-      row.appendChild(rm);
+      row.appendChild(urlInput);
       adminSocialLinks.appendChild(row);
     });
   }
@@ -1200,15 +1274,386 @@ document.addEventListener("DOMContentLoaded", function () {
     rows.forEach((row) => {
       const inputs = row.querySelectorAll('input');
       if (inputs.length >= 3) {
-        const key = inputs[0].value.trim();
+        // Реальный ключ берём из data-атрибута (в поле показываем без префикса social_)
+        const key = inputs[0].dataset.socialKey || ('social_' + inputs[0].value.trim());
         const label = inputs[1].value.trim();
-        const url = inputs[2].value.trim() || '#';
+        const url = inputs[2].value.trim() ? normalizeUrl(inputs[2].value.trim()) : '#';
         if (key) {
           out[key] = { label: label || key.replace('social_', ''), url };
         }
       }
     });
     return out;
+  }
+
+  /* =====================================================================
+   * ПРОЕКТЫ (посты): картинка + дата + подпись на каждом языке
+   * ===================================================================== */
+  function loadProjects() {
+    try {
+      const stored = localStorage.getItem('projects');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) { console.warn('projects parse error', e); }
+    return [];
+  }
+
+  // Подпись поста на текущем языке (с откатом на русский / любой заполненный)
+  function projectCaption(post, lang) {
+    const cap = post && post.caption ? post.caption : {};
+    if (typeof cap === 'string') return cap; // на случай старого формата
+    return cap[lang] || cap.ru || cap.en || Object.values(cap).find(Boolean) || '';
+  }
+
+  function formatProjectDate(value, lang) {
+    if (!value) return '';
+    // value в формате YYYY-MM-DD из <input type=date>
+    const d = new Date(value + 'T00:00:00');
+    if (isNaN(d.getTime())) return value;
+    const localeMap = { ru: 'ru-RU', en: 'en-US', es: 'es-ES', zh: 'zh-CN', ko: 'ko-KR' };
+    try {
+      return d.toLocaleDateString(localeMap[lang] || 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) { return value; }
+  }
+
+  function renderProjectsFeed() {
+    if (!projectsFeed) return;
+    projectsFeed.innerHTML = '';
+    const posts = Array.isArray(projectsData) ? projectsData : [];
+    if (!posts.length) {
+      const empty = document.createElement('p');
+      empty.className = 'projects-empty';
+      empty.textContent = getText('projects_item1') || 'Проекты будут добавлены в ближайшее время.';
+      projectsFeed.appendChild(empty);
+      return;
+    }
+    posts.forEach((post) => {
+      const card = document.createElement('article');
+      card.className = 'project-post';
+
+      if (post.image) {
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'project-post__media';
+        const img = document.createElement('img');
+        img.src = post.image;
+        img.alt = projectCaption(post, currentLanguage) || 'Проект';
+        img.loading = 'lazy';
+        imgWrap.appendChild(img);
+        card.appendChild(imgWrap);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'project-post__body';
+
+      const dateStr = formatProjectDate(post.date, currentLanguage);
+      if (dateStr) {
+        const dateEl = document.createElement('time');
+        dateEl.className = 'project-post__date';
+        if (post.date) dateEl.dateTime = post.date;
+        dateEl.textContent = dateStr;
+        body.appendChild(dateEl);
+      }
+
+      const caption = projectCaption(post, currentLanguage);
+      if (caption) {
+        const capEl = document.createElement('p');
+        capEl.className = 'project-post__caption';
+        capEl.textContent = caption; // textContent — без XSS
+        body.appendChild(capEl);
+      }
+
+      card.appendChild(body);
+      projectsFeed.appendChild(card);
+    });
+  }
+
+  // Читаем из localStorage картинку поста по индексу (картинки храним отдельно из-за размера)
+  function renderAdminProjectsList() {
+    if (!adminProjectsList) return;
+    if (!adminEditLang) adminEditLang = currentLanguage;
+    adminProjectsList.innerHTML = '';
+    const posts = Array.isArray(projectsData) ? projectsData : [];
+    posts.forEach((post, index) => {
+      const row = document.createElement('div');
+      row.className = 'admin-project-row';
+      row.dataset.index = String(index);
+
+      // Превью + кнопка картинки
+      const media = document.createElement('div');
+      media.className = 'admin-project-media';
+      const preview = document.createElement('div');
+      preview.className = 'admin-project-preview';
+      if (post.image) {
+        const img = document.createElement('img');
+        img.src = post.image;
+        preview.appendChild(img);
+      } else {
+        preview.textContent = 'нет фото';
+      }
+      const imgBtn = document.createElement('button');
+      imgBtn.type = 'button';
+      imgBtn.className = 'admin-button admin-button--secondary';
+      imgBtn.textContent = post.image ? 'Заменить фото' : 'Загрузить фото';
+      imgBtn.addEventListener('click', () => pickProjectImage(index));
+      media.appendChild(preview);
+      media.appendChild(imgBtn);
+
+      // Поля: дата + подпись (для выбранного языка)
+      const fields = document.createElement('div');
+      fields.className = 'admin-project-fields';
+
+      const dateLabel = document.createElement('label');
+      dateLabel.textContent = 'Дата';
+      const dateInput = document.createElement('input');
+      dateInput.type = 'date';
+      dateInput.className = 'admin-project-date';
+      dateInput.value = post.date || '';
+
+      const capLabel = document.createElement('label');
+      capLabel.textContent = 'Подпись (' + adminEditLang.toUpperCase() + ')';
+      const capInput = document.createElement('textarea');
+      capInput.className = 'admin-project-caption';
+      capInput.rows = 2;
+      capInput.value = (post.caption && typeof post.caption === 'object') ? (post.caption[adminEditLang] || '') : (post.caption || '');
+
+      fields.appendChild(dateLabel);
+      fields.appendChild(dateInput);
+      fields.appendChild(capLabel);
+      fields.appendChild(capInput);
+
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'admin-button admin-button--secondary admin-project-remove';
+      rm.textContent = 'Удалить пост';
+      rm.addEventListener('click', () => {
+        // Сохраняем то, что введено сейчас, затем удаляем
+        projectsData = collectAdminProjects();
+        projectsData.splice(index, 1);
+        renderAdminProjectsList();
+      });
+
+      row.appendChild(media);
+      row.appendChild(fields);
+      row.appendChild(rm);
+      adminProjectsList.appendChild(row);
+    });
+  }
+
+  // Собираем посты из админки (подпись пишется в выбранный язык, остальные языки сохраняются)
+  function collectAdminProjects() {
+    if (!adminProjectsList) return Array.isArray(projectsData) ? projectsData : [];
+    const editLang = adminEditLang || currentLanguage;
+    const out = [];
+    adminProjectsList.querySelectorAll('.admin-project-row').forEach((row) => {
+      const index = parseInt(row.dataset.index, 10);
+      const existing = (Array.isArray(projectsData) && projectsData[index]) ? projectsData[index] : {};
+      const date = row.querySelector('.admin-project-date')?.value || '';
+      const capValue = row.querySelector('.admin-project-caption')?.value.trim() || '';
+      const caption = (existing.caption && typeof existing.caption === 'object') ? { ...existing.caption } : {};
+      caption[editLang] = capValue;
+      out.push({ image: existing.image || '', date, caption });
+    });
+    return out;
+  }
+
+  let pendingProjectImageIndex = null;
+  function pickProjectImage(index) {
+    pendingProjectImageIndex = index;
+    if (adminGalleryFileInput) {
+      // используем общий файловый input в режиме «проект»
+      adminGalleryFileInput.dataset.mode = 'project';
+      adminGalleryFileInput.value = '';
+      adminGalleryFileInput.click();
+    }
+  }
+
+  /* =====================================================================
+   * ЭКСПОРТ / ИМПОРТ всего редактируемого контента (перенос между устройствами)
+   * ===================================================================== */
+  // Ключи localStorage, которые относятся к контенту (без паролей/EmailJS-ключей).
+  const CONTENT_KEYS = [
+    'galleryItems', 'galleryFilters', 'customTexts', 'projects', 'socialLinks',
+    'adminHeaderImage', 'adminLeftSidebar', 'adminRightSidebar', 'watermark',
+    'emailjsConfig', 'ntfyTopic',
+  ];
+
+  // Собрать весь контент в один объект (строки, как в localStorage)
+  function buildContentPayload() {
+    const data = { _format: 'podvalnia-portfolio', _version: 1 };
+    CONTENT_KEYS.forEach((k) => {
+      const v = localStorage.getItem(k);
+      if (v != null) data[k] = v;
+    });
+    return data;
+  }
+
+  // Применить контент из объекта в localStorage и перерисовать страницу
+  function applyContentPayload(data, { repopulateAdmin } = {}) {
+    if (!data || data._format !== 'podvalnia-portfolio') return false;
+    CONTENT_KEYS.forEach((k) => {
+      if (typeof data[k] === 'string') localStorage.setItem(k, data[k]);
+    });
+    galleryItems = loadGalleryItems();
+    projectsData = loadProjects();
+    const ct = JSON.parse(localStorage.getItem('customTexts') || '{}');
+    Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
+    Object.assign(customTextStore, ct);
+    applyAdminImages();
+    resetGalleryRotation();
+    applyTranslations();
+    renderSocialLinks();
+    renderProjectsFeed();
+    if (repopulateAdmin) populateAdminForm();
+    return true;
+  }
+
+  function exportContent() {
+    // Сначала зафиксируем текущие правки админки, чтобы экспорт был актуальным
+    try { saveAdminSettings(false); } catch (e) { console.warn('pre-export save failed', e); }
+    const data = buildContentPayload();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'content.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function handleImportFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result.toString());
+        if (!applyContentPayload(data, { repopulateAdmin: true })) {
+          alert('Это не файл контента сайта (content.json).');
+          return;
+        }
+        alert('Контент загружен.');
+      } catch (e) {
+        console.warn('import failed', e);
+        alert('Не удалось прочитать файл.');
+      } finally {
+        if (adminImportInput) adminImportInput.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /* =====================================================================
+   * ПУБЛИКАЦИЯ НА САЙТ через GitHub Contents API.
+   * Пишем content.json в репозиторий по личному токену. Сайт при загрузке
+   * читает этот content.json — поэтому изменения видят ВСЕ устройства.
+   * Токен хранится только в localStorage этого браузера и в код сайта не попадает.
+   * ===================================================================== */
+  const GH_CFG_KEY = 'ghPublishConfig';
+  function loadGhConfig() {
+    try { return JSON.parse(localStorage.getItem(GH_CFG_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function saveGhConfig(cfg) {
+    try { localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
+  function setPublishStatus(msg, kind) {
+    const el = document.getElementById('adminPublishStatus');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.className = 'admin-publish-status' + (kind ? ' is-' + kind : '');
+  }
+  // base64 для UTF-8 строки (btoa не умеет кириллицу напрямую)
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  async function publishToGitHub() {
+    // Сохраняем текущие правки перед публикацией
+    try { saveAdminSettings(false); } catch (e) {}
+    const owner = document.getElementById('adminGhOwner')?.value.trim();
+    const repo = document.getElementById('adminGhRepo')?.value.trim();
+    const branch = (document.getElementById('adminGhBranch')?.value.trim()) || 'main';
+    const token = document.getElementById('adminGhToken')?.value.trim();
+    if (!owner || !repo || !token) {
+      setPublishStatus('Заполните владельца, репозиторий и токен.', 'error');
+      return;
+    }
+    // Сохраняем настройки (кроме токена показываем, токен тоже храним локально)
+    saveGhConfig({ owner, repo, branch, token });
+
+    const path = 'content.json';
+    const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const payload = JSON.stringify(buildContentPayload(), null, 2);
+    const headers = {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+    };
+
+    setPublishStatus('Публикую…', 'info');
+    try {
+      // 1) узнаём текущий SHA файла (если он уже есть)
+      let sha = undefined;
+      const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, { headers });
+      if (getRes.status === 200) {
+        const cur = await getRes.json();
+        sha = cur.sha;
+      } else if (getRes.status === 401) {
+        setPublishStatus('Неверный токен (401). Проверьте токен и его права.', 'error');
+        return;
+      } else if (getRes.status === 404) {
+        // файла ещё нет или репозиторий/ветка не найдены — попробуем создать
+        sha = undefined;
+      }
+      // 2) PUT — создаём/обновляем файл
+      const body = {
+        message: 'Обновление контента сайта через админку',
+        content: utf8ToBase64(payload),
+        branch,
+      };
+      if (sha) body.sha = sha;
+      const putRes = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
+      if (putRes.ok) {
+        setPublishStatus('Опубликовано! Сайт обновится у всех за 1–2 минуты.', 'success');
+      } else {
+        const err = await putRes.json().catch(() => ({}));
+        setPublishStatus('Ошибка GitHub (' + putRes.status + '): ' + (err.message || 'см. консоль'), 'error');
+        console.warn('GitHub publish error', putRes.status, err);
+      }
+    } catch (e) {
+      console.warn('publish failed', e);
+      setPublishStatus('Сбой сети при публикации.', 'error');
+    }
+  }
+
+  // При загрузке страницы тянем опубликованный content.json из репозитория.
+  // Это источник истины для всех посетителей. Своя локальная админка не трогается:
+  // опубликованный контент применяем поверх localStorage только для отображения.
+  async function loadPublishedContent() {
+    try {
+      // относительный путь — рядом с index.html в том же репозитории
+      const res = await fetch('content.json?ts=' + (window.__cacheBust || ''), { cache: 'no-store' });
+      if (!res.ok) return false;
+      const data = await res.json();
+      return applyContentPayload(data, { repopulateAdmin: false });
+    } catch (e) {
+      // нет файла или оффлайн — просто используем встроенный контент
+      return false;
+    }
+  }
+
+  function populateGhFields() {
+    const cfg = loadGhConfig();
+    const o = document.getElementById('adminGhOwner');
+    const r = document.getElementById('adminGhRepo');
+    const b = document.getElementById('adminGhBranch');
+    const t = document.getElementById('adminGhToken');
+    if (o) o.value = cfg.owner || '';
+    if (r) r.value = cfg.repo || '';
+    if (b) b.value = cfg.branch || 'main';
+    if (t) t.value = cfg.token || '';
   }
 
   function slugifyFilterLabel(label) {
@@ -1498,6 +1943,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
     if (adminGalleryFileInput) {
+      adminGalleryFileInput.dataset.mode = 'gallery';
+      adminGalleryFileInput.value = '';
       adminGalleryFileInput.click();
     }
   }
@@ -1505,6 +1952,26 @@ document.addEventListener("DOMContentLoaded", function () {
   function handleAdminGalleryFileSelect(event) {
     const file = event.target.files?.[0];
     if (!file) return;
+    const mode = adminGalleryFileInput?.dataset.mode || 'gallery';
+
+    // Режим «проект»: вставляем картинку в выбранный пост
+    if (mode === 'project') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // зафиксируем текущие правки постов, затем подставим картинку
+        projectsData = collectAdminProjects();
+        const idx = pendingProjectImageIndex;
+        if (idx != null && projectsData[idx]) {
+          projectsData[idx].image = reader.result?.toString() || '';
+        }
+        pendingProjectImageIndex = null;
+        if (adminGalleryFileInput) { adminGalleryFileInput.value = ''; adminGalleryFileInput.dataset.mode = 'gallery'; }
+        renderAdminProjectsList();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
     const selectedFilters = getAdminSelectedGalleryFilters();
     const reader = new FileReader();
     reader.onload = () => {
@@ -1653,31 +2120,47 @@ document.addEventListener("DOMContentLoaded", function () {
   const orderContactInput = document.getElementById("orderContact");
   const orderReplyTo = document.getElementById("orderReplyTo");
 
+  // Форма сотрудничества (та же логика контакта, что и у заказа)
+  const collabForm = document.getElementById("collabForm");
+  const collabStatus = document.getElementById("collabStatus");
+  const collabSubmit = document.getElementById("collabSubmit");
+  const collabContactMethod = document.getElementById("collabContactMethod");
+  const collabContactInput = document.getElementById("collabContact");
+  const collabReplyTo = document.getElementById("collabReplyTo");
+
   // Подсказки/тип поля контакта зависят от выбранного способа связи.
   // Для Email включаем встроенную валидацию e-mail; для Discord/Telegram — обычный ник.
-  function updateContactFieldUI() {
-    if (!orderContactMethod || !orderContactInput) return;
-    const method = orderContactMethod.value;
+  function updateContactFieldUIFor(methodSel, input) {
+    if (!methodSel || !input) return;
+    const method = methodSel.value;
     if (method === "email") {
-      orderContactInput.type = "email";
-      orderContactInput.placeholder = getText("order_form_contact_ph_email") || "you@example.com";
-      orderContactInput.autocomplete = "email";
+      input.type = "email";
+      input.placeholder = getText("order_form_contact_ph_email") || "you@example.com";
+      input.autocomplete = "email";
     } else if (method === "discord") {
-      orderContactInput.type = "text";
-      orderContactInput.placeholder = getText("order_form_contact_ph_discord") || "напр. username или username#1234";
-      orderContactInput.autocomplete = "off";
+      input.type = "text";
+      input.placeholder = getText("order_form_contact_ph_discord") || "напр. username или username#1234";
+      input.autocomplete = "off";
     } else if (method === "telegram") {
-      orderContactInput.type = "text";
-      orderContactInput.placeholder = getText("order_form_contact_ph_telegram") || "напр. @username";
-      orderContactInput.autocomplete = "off";
+      input.type = "text";
+      input.placeholder = getText("order_form_contact_ph_telegram") || "напр. @username";
+      input.autocomplete = "off";
     }
+  }
+  function updateContactFieldUI() {
+    updateContactFieldUIFor(orderContactMethod, orderContactInput);
+    updateContactFieldUIFor(collabContactMethod, collabContactInput);
   }
 
   // reply_to (Reply-To письма) имеет смысл только для e-mail; иначе оставляем пустым.
+  function syncContactFieldFor(methodSel, input, replyTo) {
+    if (!replyTo) return;
+    const method = methodSel ? methodSel.value : "email";
+    replyTo.value = (method === "email" && input) ? input.value.trim() : "";
+  }
   function syncContactField() {
-    if (!orderReplyTo) return;
-    const method = orderContactMethod ? orderContactMethod.value : "email";
-    orderReplyTo.value = (method === "email" && orderContactInput) ? orderContactInput.value.trim() : "";
+    syncContactFieldFor(orderContactMethod, orderContactInput, orderReplyTo);
+    syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
   }
 
   function loadEmailjsConfig() {
@@ -1734,6 +2217,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Push-уведомление о новой заявке через ntfy.sh (если задан канал).
+  // Токенов не требует — отправляем простой POST на публичный канал.
+  // Заголовок/текст с кириллицей кладём в тело (UTF-8); в заголовок только ASCII.
+  function sendNtfyNotification(data) {
+    let topic = '';
+    try { topic = (localStorage.getItem('ntfyTopic') || '').trim(); } catch (e) {}
+    if (!topic) return;
+    const body = [
+      '🔔 Новая заявка: ' + (data.work_type || ''),
+      'Имя: ' + (data.from_name || '—'),
+      'Контакт: ' + ((data.contact_method || '') + ' ' + (data.contact || '—')).trim(),
+      data.budget && data.budget !== '—' ? 'Бюджет: ' + data.budget : '',
+      data.deadline && data.deadline !== '—' ? 'Срок: ' + data.deadline : '',
+      '',
+      (data.message || ''),
+    ].filter((l) => l !== '').join('\n');
+    try {
+      fetch('https://ntfy.sh/' + encodeURIComponent(topic), {
+        method: 'POST',
+        headers: { 'Title': 'Podvalnia: new request', 'Tags': 'art,incoming_envelope', 'Priority': 'high' },
+        body: body,
+      }).catch((e) => console.warn('ntfy send failed', e));
+    } catch (e) { console.warn('ntfy error', e); }
+  }
+
   function handleOrderSubmit(event) {
     event.preventDefault();
     if (!orderForm) return;
@@ -1769,6 +2277,9 @@ document.addEventListener("DOMContentLoaded", function () {
       at: new Date().toISOString(),
     };
 
+    // Push-уведомление (ntfy) — независимо от EmailJS
+    sendNtfyNotification(data);
+
     if (orderSubmit) {
       orderSubmit.disabled = true;
       orderForm.setAttribute("aria-busy", "true");
@@ -1803,6 +2314,76 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Универсальный статус для любой формы
+  function setFormStatus(el, messageKey, kind) {
+    if (!el) return;
+    el.textContent = messageKey ? (getText(messageKey) || messageKey) : "";
+    el.className = "order-status" + (kind ? " is-" + kind : "");
+  }
+
+  // Заявка на сотрудничество — та же EmailJS, помечается work_type = «Сотрудничество».
+  function handleCollabSubmit(event) {
+    event.preventDefault();
+    if (!collabForm) return;
+    const hp = collabForm.querySelector('input[name="_gotcha"]');
+    if (hp && hp.value) return;
+    syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
+    if (!collabForm.checkValidity()) {
+      collabForm.reportValidity();
+      return;
+    }
+
+    const method = collabContactMethod ? collabContactMethod.value : "email";
+    const methodLabel = collabContactMethod
+      ? (collabContactMethod.options[collabContactMethod.selectedIndex]?.textContent || method)
+      : "Email";
+    const contactValue = collabContactInput ? collabContactInput.value.trim() : "";
+
+    const data = {
+      from_name: collabForm.querySelector('[name="from_name"]').value.trim(),
+      contact_method: methodLabel,
+      contact: contactValue,
+      reply_to: method === "email" ? contactValue : "",
+      work_type: getText("collab_form_kind") || "Сотрудничество",
+      budget: "—",
+      deadline: "—",
+      message: collabForm.querySelector('[name="message"]').value.trim(),
+      at: new Date().toISOString(),
+    };
+
+    sendNtfyNotification(data);
+
+    if (collabSubmit) {
+      collabSubmit.disabled = true;
+      collabForm.setAttribute("aria-busy", "true");
+    }
+    setFormStatus(collabStatus, "order_form_sending", "info");
+
+    const finish = (key, kind, reset) => {
+      setFormStatus(collabStatus, key, kind);
+      if (collabSubmit) {
+        collabSubmit.disabled = false;
+        collabForm.removeAttribute("aria-busy");
+      }
+      if (reset) collabForm.reset();
+    };
+
+    if (isEmailjsConfigured()) {
+      const cfg = loadEmailjsConfig();
+      window.emailjs
+        .sendForm(cfg.serviceId, cfg.templateId, collabForm, { publicKey: cfg.publicKey })
+        .then(() => finish("order_form_success", "success", true))
+        .catch((err) => {
+          console.warn("EmailJS send failed", err);
+          saveOrderLocally(data);
+          finish("order_form_error", "error", false);
+        });
+    } else {
+      saveOrderLocally(data);
+      finish("order_form_saved", "info", true);
+    }
+  }
+
   /* =====================================================================
    * АДМИНКА: настройки EmailJS + просмотр локальных заявок
    * ===================================================================== */
@@ -1827,11 +2408,13 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("watermark", JSON.stringify(wm));
   }
 
+  const adminNtfyTopic = document.getElementById("adminNtfyTopic");
   function populateEmailjsFields() {
     const cfg = loadEmailjsConfig();
     if (adminEmailjsPublicKey) adminEmailjsPublicKey.value = cfg.publicKey;
     if (adminEmailjsServiceId) adminEmailjsServiceId.value = cfg.serviceId;
     if (adminEmailjsTemplateId) adminEmailjsTemplateId.value = cfg.templateId;
+    if (adminNtfyTopic) adminNtfyTopic.value = localStorage.getItem('ntfyTopic') || '';
   }
   function saveEmailjsConfig() {
     const cfg = {
@@ -1840,6 +2423,7 @@ document.addEventListener("DOMContentLoaded", function () {
       templateId: adminEmailjsTemplateId ? adminEmailjsTemplateId.value.trim() : "",
     };
     localStorage.setItem("emailjsConfig", JSON.stringify(cfg));
+    if (adminNtfyTopic) localStorage.setItem('ntfyTopic', adminNtfyTopic.value.trim());
   }
   function renderAdminOrders() {
     if (!adminOrdersList) return;
@@ -1891,6 +2475,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const lang = button.dataset.lang;
       setLanguage(lang);
     });
+  });
+
+  // Lightbox: закрытие по кнопке, клику по фону и Esc
+  if (lightboxClose) lightboxClose.addEventListener("click", closeLightbox);
+  if (lightbox) {
+    lightbox.addEventListener("click", (ev) => {
+      // закрываем при клике по фону, но не по самой картинке
+      if (ev.target === lightbox || ev.target.classList.contains("lightbox__stage")) closeLightbox();
+    });
+  }
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) closeLightbox();
   });
 
   // Тема
@@ -1952,6 +2548,20 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   if (orderContactInput) {
     orderContactInput.addEventListener("input", syncContactField);
+  }
+
+  // Форма сотрудничества
+  if (collabForm) {
+    collabForm.addEventListener("submit", handleCollabSubmit);
+  }
+  if (collabContactMethod) {
+    collabContactMethod.addEventListener("change", () => {
+      updateContactFieldUIFor(collabContactMethod, collabContactInput);
+      syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
+    });
+  }
+  if (collabContactInput) {
+    collabContactInput.addEventListener("input", () => syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo));
   }
   updateContactFieldUI();
 
@@ -2024,25 +2634,42 @@ document.addEventListener("DOMContentLoaded", function () {
     adminGalleryFileInput.addEventListener('change', handleAdminGalleryFileSelect);
   }
 
-  if (adminAddSocialLink) {
-    adminAddSocialLink.addEventListener("click", () => {
-      const label = prompt('Введите название кнопки социальной сети:');
-      if (!label) return;
-      const url = prompt('Введите ссылку для этой кнопки:');
-      if (!url) return;
-      const links = loadSocialLinks();
-      const keyBase = slugifyFilterLabel(label) || 'social';
-      let key = `social_${keyBase}`;
-      let index = 1;
-      while (links[key]) {
-        key = `social_${keyBase}_${index}`;
-        index += 1;
-      }
-      links[key] = { label: label.trim(), url: normalizeUrl(url.trim()) };
-      localStorage.setItem('socialLinks', JSON.stringify(links));
-      renderAdminSocialList();
-      renderSocialLinks();
+  // Переключение языка в редакторе текста админки
+  if (adminTextLang) {
+    adminTextLang.addEventListener('change', () => {
+      // Сохраним текущие правки текста и постов перед переключением языка
+      const editLang = adminEditLang || currentLanguage;
+      const updated = collectAdminTextOverrides();
+      if (!customTextStore[editLang]) customTextStore[editLang] = {};
+      Object.assign(customTextStore[editLang], updated);
+      projectsData = collectAdminProjects();
+      adminEditLang = adminTextLang.value;
+      renderAdminTextList();
+      renderAdminProjectsList();
     });
+  }
+
+  // Добавить пост в «Мои проекты»
+  if (adminAddProject) {
+    adminAddProject.addEventListener('click', () => {
+      projectsData = collectAdminProjects();
+      projectsData.push({ image: '', date: '', caption: {} });
+      renderAdminProjectsList();
+    });
+  }
+
+  // Экспорт всего контента в JSON-файл
+  if (adminExport) {
+    adminExport.addEventListener('click', exportContent);
+  }
+  if (adminImport && adminImportInput) {
+    adminImport.addEventListener('click', () => adminImportInput.click());
+    adminImportInput.addEventListener('change', handleImportFile);
+  }
+  // Публикация на сайт через GitHub
+  const adminPublishBtn = document.getElementById('adminPublish');
+  if (adminPublishBtn) {
+    adminPublishBtn.addEventListener('click', publishToGitHub);
   }
 
   try {
@@ -2083,19 +2710,27 @@ document.addEventListener("DOMContentLoaded", function () {
     adminClose.addEventListener("click", closeAdminPanel);
   }
 
+  // «Сохранить и закрыть» — сохраняет и закрывает панель
   if (adminSave) {
-    adminSave.addEventListener("click", saveAdminSettings);
+    adminSave.addEventListener("click", () => saveAdminSettings(true));
   }
-
+  // «Применить (предпросмотр)» — сохраняет и сразу показывает на странице, не закрывая панель
   if (adminApply) {
-    adminApply.addEventListener("click", saveAdminSettings);
+    adminApply.addEventListener("click", () => saveAdminSettings(false));
   }
 
   if (adminReset) {
     adminReset.addEventListener("click", () => {
-      localStorage.removeItem("galleryItems");
+      if (!confirm('Сбросить ВЕСЬ контент к стандартному (галерея, тексты, проекты, соцсети)? Это нельзя отменить.')) return;
+      ['galleryItems','galleryFilters','customTexts','projects','socialLinks'].forEach((k) => localStorage.removeItem(k));
       galleryItems = loadGalleryItems();
+      projectsData = loadProjects();
+      Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
       resetGalleryRotation();
+      applyTranslations();
+      renderSocialLinks();
+      renderProjectsFeed();
+      populateAdminForm();
     });
   }
 
@@ -2112,12 +2747,30 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   galleryItems = loadGalleryItems();
+  projectsData = loadProjects();
   resetGalleryRotation();
   applyTranslations();
   applyAdminImages();
   populateOrderTypeSelect();
+  renderProjectsFeed();
   updateLangSwitcher();
-  // Плашку выбора языка показываем при КАЖДОЙ загрузке/перезагрузке страницы.
-  // Это просьба владельца сайта — приветственный выбор языка как в прошлой версии.
-  showLanguageModal();
+
+  // Подтягиваем опубликованный контент (content.json в репозитории) — источник истины
+  // для всех посетителей. Работает по http(s); на file:// просто пропускается.
+  loadPublishedContent().then((ok) => {
+    if (ok) {
+      // перерисовать всё с опубликованными данными
+      buildFilterButtons();
+      resetGalleryRotation();
+      applyTranslations();
+      renderSocialLinks();
+      renderProjectsFeed();
+      updateLangSwitcher();
+    }
+  });
+  // Плашку выбора языка показываем ТОЛЬКО при первом заходе (язык ещё не выбран).
+  // После выбора язык сохраняется в localStorage, и при следующих заходах плашки нет.
+  if (!localStorage.getItem("siteLanguage")) {
+    showLanguageModal();
+  }
 });
