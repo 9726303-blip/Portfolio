@@ -21,88 +21,52 @@
   --t-med: 0.32s;
 }
 
-/* ===== Светлая тема (по умолчанию) =====
-   Палитра взята ТОЧНО из исходного файла палитра.jpg:
-     #513215 тёмно-коричневый · #A13808 кирпич · #E98E0C оранжевый · #F0BB51 янтарь */
+/* ===== Светлая тема (по умолчанию) ===== */
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --c-brown: #513215;
-  --c-brick: #a13808;
-  --c-orange: #e98e0c;
-  --c-amber: #f0bb51;
-
-  --bg: var(--c-amber);
-  --surface: var(--c-orange);
-  --surface-strong: var(--c-brick);
-  --accent: var(--c-brown);
-  --accent-soft: #f4cd7e;
-  --text: #3b2613;
-  --text-soft: #6b4e30;
-  --shadow: 0 24px 80px rgba(81, 50, 21, 0.24);
+  --bg: #f5c56a;
+  --surface: #f2a30f;
+  --surface-strong: #bf3f0a;
+  --accent: #4f3216;
+  --accent-soft: #f7cf7d;
+  --text: #3b2c1e;
+  --text-soft: #5d4a37;
+  --shadow: 0 24px 80px rgba(88, 46, 17, 0.22);
 
   /* Поверхности под 2026: стекло */
-  --card-bg: rgba(255, 244, 222, 0.82);
-  --card-border: rgba(255, 255, 255, 0.5);
+  --card-bg: rgba(255, 243, 218, 0.78);
+  --card-border: rgba(255, 255, 255, 0.45);
   --glass-blur: 16px;
-  /* СВЕРХУ тёпло-оранжевый → янтарь → оранжевый → тёмный оранжево-кирпичный К НИЗУ. */
-  --page-bg: linear-gradient(180deg,
-    #fad199 0%,
-    #efb544 18%,
-    #eca52f 48%,
-    #e2811a 76%,
-    #c25510 100%);
-  /* Жёлтые пилюли-фильтров — светлее и желтее */
-  --filter-bg: #fbe49a;
-  --filter-bg-hover: #ffefb0;
-  --field-bg: #fff7ea;
-  --field-border: rgba(112, 76, 34, 0.2);
-  --ring: rgba(233, 142, 12, 0.55);
+  /* Палитра как в задумке: СВЕРХУ жёлтый → К НИЗУ оранжевый (без тёмно-красного).
+     Градиент тянется по всей высоте страницы. */
+  --page-bg: linear-gradient(180deg, #f7cf73 0%, #f3b637 38%, #ef9d2a 70%, #e9821f 100%);
+  --field-bg: #fffaf3;
+  --field-border: rgba(112, 76, 34, 0.18);
+  --ring: rgba(214, 120, 38, 0.55);
 }
 
-/* ===== Тёмная тема ===== тёплая, тёмно-коричнево-оранжевая (та же палитра, темнее) */
+/* ===== Тёмная тема ===== */
 [data-theme="dark"] {
   color-scheme: dark;
-  --c-brown: #513215;
-  --c-brick: #a13808;
-  --c-orange: #e98e0c;
-  --c-amber: #f0bb51;
-
-  --bg: #20140a;
-  --surface: #c2741a;
-  --surface-strong: #d96a1f;
+  --bg: #1a120b;
+  --surface: #c97a1e;
+  --surface-strong: #e8893a;
   --accent: #f4d8a8;
-  --accent-soft: #5a3a16;
-  --text: #f7e8cf;
-  --text-soft: #d8bf99;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  --accent-soft: #6b4519;
+  --text: #f6e7cf;
+  --text-soft: #d8c2a0;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
 
-  --card-bg: rgba(54, 35, 18, 0.7);
-  --card-border: rgba(244, 216, 168, 0.16);
+  --card-bg: rgba(46, 32, 19, 0.66);
+  --card-border: rgba(244, 216, 168, 0.14);
   --glass-blur: 18px;
-  /* Сверху чуть теплее/светлее → к низу заметно темнее, без чёрного — тёплый коричневый. */
-  --page-bg: linear-gradient(180deg,
-    #3a2310 0%,
-    #2c1a0c 38%,
-    #20140a 72%,
-    #160d06 100%);
-  --filter-bg: rgba(201, 122, 30, 0.28);
-  --filter-bg-hover: rgba(233, 142, 12, 0.42);
-  --field-bg: rgba(34, 22, 12, 0.9);
-  --field-border: rgba(244, 216, 168, 0.2);
-  --ring: rgba(233, 142, 12, 0.6);
-}
-
-/* Тёмная тема: затемнение шапки СНИЗУ (как просили) — тёплый коричневый низ */
-[data-theme="dark"] .hero-section {
-  background: linear-gradient(180deg, #3a2310 0%, #2a1809 100%);
-}
-[data-theme="dark"] .hero-section::after {
-  background: linear-gradient(180deg,
-    rgba(40, 24, 10, 0.30) 0%,
-    rgba(40, 24, 10, 0.45) 40%,
-    rgba(28, 16, 8, 0.80) 78%,
-    rgba(22, 13, 6, 0.96) 100%);
+  --page-bg: radial-gradient(circle at top left, rgba(201, 122, 30, 0.22), transparent 32%),
+             radial-gradient(circle at bottom right, rgba(120, 60, 20, 0.3), transparent 30%),
+             linear-gradient(180deg, #241710 0%, #1a120b 45%, #120c07 100%);
+  --field-bg: rgba(28, 19, 11, 0.85);
+  --field-border: rgba(244, 216, 168, 0.18);
+  --ring: rgba(244, 184, 110, 0.6);
 }
 
 * {
@@ -308,13 +272,6 @@ body {
   max-width: 100%;
   overflow-x: hidden;
 }
-/* Плавная прокрутка к якорям навигации (#order, #socials и т.д.) */
-html {
-  scroll-behavior: smooth;
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-}
 
 .side-panel {
   position: fixed;
@@ -357,20 +314,16 @@ html {
   position: relative;
   padding: 40px 24px 60px;
   overflow: hidden;
-  background: linear-gradient(180deg, #fbe6c2 0%, #f3c462 100%);
+  background: linear-gradient(180deg, #fbe6b0 0%, #f7cf73 100%);
 }
 
-/* Тёплая вуаль поверх картинки шапки: лёгкая бежевая сверху и сильно затемняющая
-   К НИЗУ ОРАНЖЕВЫМ (а не жёлтым) — плавно переходит в верх страницы. */
+/* Тёплая вуаль поверх фоновой картинки шапки: жёлтый сверху → оранжевый снизу
+   (тон совпадает с верхом общего градиента страницы, без красного). */
 .hero-section::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-    rgba(251, 230, 194, 0.18) 0%,
-    rgba(240, 187, 81, 0.28) 42%,
-    rgba(233, 142, 12, 0.60) 78%,
-    rgba(194, 85, 16, 0.80) 100%);
+  background: linear-gradient(180deg, rgba(251, 230, 176, 0.55), rgba(243, 182, 55, 0.55) 55%, rgba(239, 157, 42, 0.6) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -427,22 +380,22 @@ html {
 .hero-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(8px, 1.2vw, 14px);
+  gap: 14px;
   justify-content: center;
-  margin-bottom: clamp(20px, 3vw, 32px);
+  margin-bottom: 32px;
 }
 
-/* Кнопки навигации плавно уменьшаются вместе с окном (padding/шрифт через clamp) */
 .nav-button {
-  padding: clamp(11px, 1.4vw, 18px) clamp(16px, 2.4vw, 30px);
+  padding: 20px 32px;
+  color: #3b2c1e;
   text-decoration: none;
   border-radius: 999px;
-  background: rgba(161, 56, 8, 0.96);
-  box-shadow: 0 10px 22px rgba(88, 45, 17, 0.18);
+  background: rgba(183, 78, 18, 0.96);
+  box-shadow: 0 12px 26px rgba(88, 45, 17, 0.18);
   transition: transform 0.2s ease, background 0.2s ease;
-  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  font-size: 1.05rem;
   font-weight: 600;
-  min-width: clamp(150px, 18vw, 230px);
+  min-width: 240px;
   text-align: center;
   color: #f7e2b0;
 }
@@ -1074,44 +1027,39 @@ main {
 }
 
 .filter-button {
-  padding: clamp(9px, 1.1vw, 14px) clamp(12px, 1.6vw, 18px);
-  font-size: clamp(0.85rem, 1vw, 0.98rem);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 14px 18px;
+  border: 1px solid var(--card-border);
   border-radius: 999px;
-  /* Жёлтые пилюли, как на референсе */
-  background: var(--filter-bg);
-  color: #4a3517;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text);
   cursor: pointer;
-  font-weight: 600;
   transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
-  box-shadow: 0 10px 20px rgba(122, 68, 10, 0.14);
+  box-shadow: 0 12px 24px rgba(122, 68, 10, 0.12);
 }
 
 .filter-button:hover,
 .filter-button:focus-visible {
   transform: translateY(-2px);
-  background: var(--filter-bg-hover);
+  background: rgba(255, 235, 150, 0.96);
 }
 
 .filter-button.active {
-  background: #c8521a;
-  color: #fff3df;
+  background: rgba(214, 120, 38, 0.98);
+  color: #3b2c1e;
 }
 
 .floating-gallery {
   margin-top: 36px;
   display: grid;
-  gap: clamp(10px, 1.4vw, 18px);
-  /* Ровная сетка одинаковых ячеек; ширина ячейки тянется с окном */
-  grid-template-columns: repeat(auto-fill, minmax(clamp(180px, 22vw, 240px), 1fr));
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   overflow: hidden;
 }
 
-/* «Золотой стандарт» карточки: единый размер для всех работ.
-   Каждая карточка — фиксированное соотношение сторон 4:5, любое изображение
-   вписывается в него одинаково. Так разные по размеру арты не ломают сетку. */
 .art-card {
-  aspect-ratio: 4 / 5;
+  min-height: 240px;
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -1129,115 +1077,13 @@ main {
   box-shadow: 0 36px 90px rgba(88, 46, 17, 0.32);
 }
 
-/* Картинка заполняет карточку целиком, центрируется и аккуратно кадрируется.
-   Полную (необрезанную) версию показываем по клику в lightbox. */
 .art-card img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
   transition: transform var(--t-med) var(--ease);
 }
 
 .art-card:hover img {
   transform: scale(1.05);
 }
-
-/* Подсказка-зум при наведении */
-.art-card .art-zoom-hint {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  z-index: 4;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(20, 15, 10, 0.55);
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transition: opacity var(--t-fast) var(--ease);
-  pointer-events: none;
-}
-.art-card:hover .art-zoom-hint { opacity: 1; }
-.art-card .art-zoom-hint::before {
-  content: "⤢";
-  color: #fff7e9;
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-/* ----- Lightbox: полноразмерный просмотр работы ----- */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 5000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 10, 6, 0.92);
-  padding: 32px;
-  animation: langOverlayIn 0.25s var(--ease) both;
-}
-.lightbox__stage {
-  position: relative;
-  max-width: 96vw;
-  max-height: 90vh;
-  display: flex;
-}
-.lightbox__stage img {
-  max-width: 96vw;
-  max-height: 90vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
-  /* Защита: нельзя перетащить/выделить */
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-}
-/* Водяной знак поверх увеличенной работы */
-.lightbox__watermark {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  overflow: hidden;
-}
-.lightbox__watermark span {
-  font-family: var(--font-hand);
-  font-size: clamp(1.4rem, 4vw, 3rem);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-  transform: rotate(-24deg);
-  white-space: nowrap;
-  letter-spacing: 0.04em;
-}
-.lightbox__close {
-  position: absolute;
-  top: 18px;
-  right: 22px;
-  width: 46px;
-  height: 46px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  font-size: 1.8rem;
-  line-height: 1;
-  cursor: pointer;
-  z-index: 5001;
-  transition: background var(--t-fast) var(--ease);
-}
-.lightbox__close:hover { background: rgba(255, 255, 255, 0.3); }
 
 @keyframes cardAppear {
   to {
@@ -1550,12 +1396,11 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: clamp(100px, 12vw, 130px);
-  padding: clamp(10px, 1.3vw, 14px) clamp(14px, 2vw, 20px);
-  font-size: clamp(0.9rem, 1vw, 1rem);
+  min-width: 130px;
+  padding: 14px 20px;
   border-radius: 999px;
-  background: var(--filter-bg);
-  color: #3b2613;
+  background: rgba(255, 217, 105, 0.96);
+  color: #3b2c1e;
   text-decoration: none;
   font-weight: 600;
   transition: transform 0.2s ease, background 0.2s ease;
@@ -1650,11 +1495,14 @@ main {
     gap: 10px;
   }
 
-  /* Галерея на телефоне — ДВЕ колонки, карточки меньше (соотношение 4:5 сохраняется) */
+  /* Галерея — одна колонка, ниже карточки */
   .floating-gallery {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 22px;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .art-card {
+    min-height: 220px;
   }
 
   /* Карточки/секции — меньше внутренних отступов */
@@ -1980,8 +1828,7 @@ main {
 .cta-button {
   border: none;
   border-radius: var(--radius-pill);
-  padding: clamp(12px, 1.5vw, 15px) clamp(20px, 3vw, 30px);
-  font-size: clamp(0.92rem, 1vw, 1rem);
+  padding: 15px 30px;
   /* Тёмная часть градиента ближе к surface-strong — контраст для светлого текста */
   background: linear-gradient(135deg, var(--surface-strong) 0%, #8f2e07 100%);
   color: #fff7e9;
@@ -2319,26 +2166,6 @@ main {
   font: inherit;
 }
 
-/* Верхний выбор языка в админке — выделенный */
-.admin-lang-top {
-  background: rgba(233, 142, 12, 0.12);
-  border: 1px solid rgba(233, 142, 12, 0.4);
-  border-radius: 14px;
-  padding: 14px 16px;
-}
-.admin-lang-top select {
-  width: 100%;
-  max-width: 280px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--field-border);
-  background: var(--field-bg);
-  color: var(--text);
-  font: inherit;
-  font-weight: 600;
-  margin-top: 6px;
-}
-
 .admin-projects-list {
   display: grid;
   gap: 12px;
@@ -2411,32 +2238,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  align-items: center;
 }
-
-.admin-publish {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.admin-publish input {
-  width: 100%;
-  border: 1px solid var(--field-border);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: var(--field-bg);
-  color: var(--text);
-  font: inherit;
-}
-.admin-publish-status {
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-.admin-publish-status.is-info { color: var(--text-soft); }
-.admin-publish-status.is-success { color: #2f8a4a; }
-.admin-publish-status.is-error { color: #c0392b; }
-[data-theme="dark"] .admin-publish-status.is-success { color: #5fd98a; }
-[data-theme="dark"] .admin-publish-status.is-error { color: #ff8a80; }
 
 @media (max-width: 620px) {
   .admin-project-row { grid-template-columns: 1fr; }

@@ -57,10 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminImport = document.getElementById("adminImport");
   const adminImportInput = document.getElementById("adminImportInput");
   const projectsFeed = document.getElementById("projectsFeed");
-  const lightbox = document.getElementById("lightbox");
-  const lightboxImage = document.getElementById("lightboxImage");
-  const lightboxWatermark = document.getElementById("lightboxWatermark");
-  const lightboxClose = document.getElementById("lightboxClose");
 
   // Все поддерживаемые языки (один источник истины)
   const SUPPORTED_LANGS = ["ru", "en", "es", "zh", "ko"];
@@ -112,112 +108,63 @@ document.addEventListener("DOMContentLoaded", function () {
     { key: "portrait", label: "портреты", primary: false },
   ];
 
-  // Полный редактор текста: каждая запись — отдельный ключ с подписью и типом поля.
-  // Здесь можно править ВЕСЬ текст сайта на каждом языке: навигацию, фильтры, формы и т.д.
-  // type: 'input' (одна строка) или 'area' (многострочное).
-  const adminTextGroups = [
-    {
-      section: "Кнопки навигации",
-      fields: [
-        { key: "nav_order", label: "Кнопка «Заказать»" },
-        { key: "nav_projects", label: "Кнопка «Проекты»" },
-        { key: "nav_collab", label: "Кнопка «Сотрудничество»" },
-        { key: "nav_about", label: "Кнопка «Обо мне»" },
-        { key: "nav_socials", label: "Кнопка «Мои соцсети»" },
-      ],
-    },
+  const adminTextSections = [
     {
       section: "Главный экран",
-      fields: [
-        { key: "hero_title", label: "Ник (заголовок)" },
-        { key: "hero_subtitle", label: "Подпись под ником" },
-      ],
+      titleKey: "hero_title",
+      bodyKeys: ["hero_subtitle"],
     },
     {
       section: "Галерея",
-      fields: [
-        { key: "gallery_title", label: "Заголовок" },
-        { key: "gallery_description", label: "Описание", type: "area" },
-        { key: "gallery_empty", label: "Текст при пустой галерее", type: "area" },
-      ],
+      titleKey: "gallery_title",
+      bodyKeys: ["gallery_description", "gallery_empty"],
     },
     {
-      section: "Фильтры (ярлыки)",
-      fields: [
-        { key: "filter_all", label: "Все" },
-        { key: "filter_sketch", label: "Скетчи" },
-        { key: "filter_art", label: "Полноценные арты" },
-        { key: "filter_meme", label: "Меме" },
-        { key: "filter_animation", label: "Анимации" },
-        { key: "filter_mono", label: "Ч/Б арты" },
-        { key: "filter_animals", label: "Животные" },
-        { key: "filter_concept", label: "Концепт-арты" },
-        { key: "filter_pixel", label: "Пиксель-арт" },
-        { key: "filter_fantasy", label: "Фэнтези" },
-        { key: "filter_portrait", label: "Портреты" },
-        { key: "filter_mode_label", label: "Подпись «Совпадение:»" },
-        { key: "filter_mode_any", label: "Режим «любой»" },
-        { key: "filter_mode_all", label: "Режим «все»" },
-        { key: "filter_clear", label: "Кнопка «Сбросить фильтры»" },
-      ],
+      section: "Заказ",
+      titleKey: "order_title",
+      bodyKeys: ["order_p1"],
     },
     {
-      section: "Блок «Заказать»",
-      fields: [
-        { key: "order_title", label: "Заголовок" },
-        { key: "order_p1", label: "Описание блока", type: "area" },
-        { key: "order_form_name", label: "Поле «Имя»" },
-        { key: "order_form_contact_label", label: "Поле «Как связаться»" },
-        { key: "order_form_type", label: "Поле «Тип работы»" },
-        { key: "order_form_type_any", label: "Вариант «Любой/уточним»" },
-        { key: "order_form_budget", label: "Поле «Бюджет»" },
-        { key: "order_form_deadline", label: "Поле «Срок»" },
-        { key: "order_form_desc", label: "Поле «Опишите идею»" },
-        { key: "order_form_consent", label: "Текст согласия", type: "area" },
-        { key: "order_form_submit", label: "Кнопка отправки" },
-        { key: "order_form_sending", label: "Статус «Отправляем…»" },
-        { key: "order_form_success", label: "Статус «Успех»", type: "area" },
-        { key: "order_form_error", label: "Статус «Ошибка»", type: "area" },
-        { key: "order_form_saved", label: "Статус «Сохранено»", type: "area" },
-      ],
-    },
-    {
-      section: "Блок «Сотрудничество»",
-      fields: [
-        { key: "collab_title", label: "Заголовок" },
-        { key: "collab_p1", label: "Текст 1", type: "area" },
-        { key: "collab_p2", label: "Текст 2", type: "area" },
-        { key: "collab_form_desc", label: "Поле «Опишите предложение»" },
-        { key: "collab_form_submit", label: "Кнопка отправки" },
-      ],
-    },
-    {
-      section: "Проекты",
-      fields: [
-        { key: "projects_title", label: "Заголовок" },
-        { key: "projects_description", label: "Описание", type: "area" },
-        { key: "projects_item1", label: "Текст «постов пока нет»", type: "area" },
-      ],
+      section: "Сотрудничество",
+      titleKey: "collab_title",
+      bodyKeys: ["collab_p1", "collab_p2"],
     },
     {
       section: "Обо мне",
-      fields: [
-        { key: "about_title", label: "Заголовок" },
-        { key: "about_p1", label: "Текст", type: "area" },
-        { key: "about_li1", label: "Пункт 1" },
-        { key: "about_li2", label: "Пункт 2" },
-        { key: "about_li3", label: "Пункт 3" },
-      ],
+      titleKey: "about_title",
+      bodyKeys: ["about_p1", "about_li1", "about_li2", "about_li3"],
+    },
+    {
+      section: "Проекты",
+      titleKey: "projects_title",
+      bodyKeys: ["projects_description", "projects_item1"],
     },
     {
       section: "Футер",
-      fields: [
-        { key: "footer_title", label: "Заголовок футера" },
-        { key: "footer_copyright", label: "Копирайт", type: "area" },
-        { key: "copy_warning", label: "Текст защиты от копирования", type: "area" },
-      ],
+      titleKey: "footer_title",
+      bodyKeys: [],
     },
   ];
+
+  const adminTextFieldLabels = {
+    nav_order: "Кнопка заказа",
+    nav_projects: "Кнопка проектов",
+    nav_collab: "Кнопка сотрудничества",
+    nav_about: "Кнопка обо мне",
+    hero_subtitle: "Подзаголовок",
+    gallery_description: "Описание",
+    gallery_empty: "Текст при пустой галерее",
+    order_p1: "Текст блока заказа",
+    order_p2: "Дополнительный текст блока заказа",
+    collab_p1: "Текст блока сотрудничества",
+    collab_p2: "Дополнительный текст блока сотрудничества",
+    about_p1: "Текст блока обо мне",
+    about_li1: "Пункт 1",
+    about_li2: "Пункт 2",
+    about_li3: "Пункт 3",
+    projects_description: "Описание проектов",
+    projects_item1: "Пункт списка проектов",
+  };
 
   const translations = {
     ru: {
@@ -225,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Мои проекты",
       nav_about: "Обо мне",
       nav_collab: "Предложить сотрудничество",
-      nav_socials: "Мои соцсети",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "диджитал‑художник и аниматор.",
       gallery_title: "Галерея работ",
@@ -297,7 +243,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Projects",
       nav_about: "About",
       nav_collab: "Collaborate",
-      nav_socials: "My socials",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "Digital artist & animator.",
       gallery_title: "Gallery",
@@ -369,7 +314,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "프로젝트",
       nav_about: "소개",
       nav_collab: "협업 제안",
-      nav_socials: "내 소셜",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "디지털 아티스트 겸 애니메이터.",
       gallery_title: "갤러리",
@@ -441,7 +385,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "Proyectos",
       nav_about: "Sobre mí",
       nav_collab: "Colaborar",
-      nav_socials: "Mis redes",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "Artista digital y animador.",
       gallery_title: "Galería",
@@ -513,7 +456,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nav_projects: "项目",
       nav_about: "关于我",
       nav_collab: "合作",
-      nav_socials: "我的社交",
       hero_title: "Podvalnia_alebarda",
       hero_subtitle: "数字艺术家与动画师.",
       gallery_title: "作品集",
@@ -586,16 +528,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const customTextStore = JSON.parse(localStorage.getItem("customTexts") || "{}");
 
   // Translation functions
-  // Пустые строки в кастомных переводах считаем «не задано» и падаем на стандартный текст —
-  // чтобы случайно очищенное поле в админке не прятало кнопку/подпись.
   function getText(key) {
     const languageTexts = customTextStore[currentLanguage] || {};
     const translationText = translations[currentLanguage]?.[key];
     const russianCustom = customTextStore.ru?.[key];
-
-    if (languageTexts[key]) return languageTexts[key];
+    
+    if (languageTexts[key] !== undefined) return languageTexts[key];
     if (translationText !== undefined) return translationText;
-    if (russianCustom) return russianCustom;
+    if (russianCustom !== undefined) return russianCustom;
     if (translations.ru?.[key]) return translations.ru[key];
     return "";
   }
@@ -741,47 +681,15 @@ document.addEventListener("DOMContentLoaded", function () {
           card.appendChild(watermark);
         }
 
-        // Иконка-подсказка «развернуть»
-        const hint = document.createElement("div");
-        hint.className = "art-zoom-hint";
-        card.appendChild(hint);
-
-        // Прозрачный оверлей — перехватывает правый клик/перетаскивание изображения,
-        // а по обычному клику открывает полноразмерный просмотр (lightbox).
+        // Прозрачный оверлей — перехватывает правый клик/перетаскивание изображения
         const guard = document.createElement("div");
         guard.className = "art-guard";
-        guard.addEventListener("click", () => openLightbox(item.image, item.alt || ""));
         card.appendChild(guard);
-        card.style.cursor = "zoom-in";
       } else {
         card.classList.add("art-card--placeholder");
       }
       galleryContainer.appendChild(card);
     }
-  }
-
-  // Lightbox: открыть работу в полном размере (с водяным знаком, если включён)
-  function openLightbox(src, alt) {
-    if (!lightbox || !lightboxImage || !src) return;
-    lightboxImage.src = src;
-    lightboxImage.alt = alt || "";
-    if (lightboxWatermark) {
-      const wm = loadWatermarkSettings();
-      lightboxWatermark.innerHTML = "";
-      if (wm.enabled) {
-        const span = document.createElement("span");
-        span.textContent = wm.text || getText("hero_title") || "Podvalnia_alebarda";
-        lightboxWatermark.appendChild(span);
-      }
-    }
-    lightbox.classList.remove("hidden");
-    document.body.style.overflow = "hidden"; // не скроллить фон
-  }
-  function closeLightbox() {
-    if (!lightbox) return;
-    lightbox.classList.add("hidden");
-    if (lightboxImage) lightboxImage.src = "";
-    document.body.style.overflow = "";
   }
 
   function getSelectedFilters() {
@@ -1024,7 +932,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function populateAdminForm() {
-    if (!adminEditLang) adminEditLang = "ru";
+    if (!adminEditLang) adminEditLang = currentLanguage;
     renderAdminFilterEditor();
     renderAdminGalleryFilterSelectors();
     renderAdminGalleryList();
@@ -1033,7 +941,6 @@ document.addEventListener("DOMContentLoaded", function () {
     populateEmailjsFields();
     populateWatermarkFields();
     renderAdminOrders();
-    populateGhFields();
   }
 
   // closePanel=true → «Сохранить и закрыть»; false → «Применить (предпросмотр)».
@@ -1068,17 +975,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!existingCustom[editLang]) existingCustom[editLang] = {};
     Object.assign(existingCustom[editLang], updatedText);
 
-    // Ярлыки фильтров: ярлык из редактора фильтров — это базовый вариант. Для языков,
-    // где ярлык ещё не задан (ни в тексте, ни в стандартном переводе), подставляем его,
-    // чтобы фильтр не оставался без подписи. Если пользователь задал свой перевод ярлыка
-    // в редакторе текста (updatedText) — он уже в existingCustom[editLang] и НЕ перетирается.
+    // Ярлыки фильтров: применяем ко всем языкам как базовый вариант, если для языка
+    // ещё нет своего перевода ярлыка (чтобы фильтры не пропадали на других языках).
     filters.forEach((filter) => {
       const filterKey = `filter_${filter.key}`;
+      // для редактируемого языка — то, что ввели; для остальных — только если пусто
       SUPPORTED_LANGS.forEach((lang) => {
         if (!existingCustom[lang]) existingCustom[lang] = {};
-        const alreadyHasOwn = existingCustom[lang][filterKey] && existingCustom[lang][filterKey].trim();
-        const hasBuiltin = translations[lang] && translations[lang][filterKey];
-        if (!alreadyHasOwn && !hasBuiltin) {
+        if (lang === editLang) {
+          existingCustom[lang][filterKey] = filter.label;
+        } else if (!existingCustom[lang][filterKey] && !(translations[lang] && translations[lang][filterKey])) {
           existingCustom[lang][filterKey] = filter.label;
         }
       });
@@ -1127,22 +1033,59 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Собираем введённый текст: одно поле = один ключ. Пустое поле = ключ сбрасывается
-  // (тогда показывается стандартный перевод).
   function collectAdminTextOverrides() {
     if (!adminTextList) return {};
     const result = {};
-    Array.from(adminTextList.querySelectorAll("[data-text-key]")).forEach((field) => {
-      const key = field.dataset.textKey;
-      if (!key) return;
-      result[key] = field.value.trim();
+    Array.from(adminTextList.querySelectorAll("[data-text-key], [data-text-keys]")).forEach((field) => {
+      const keys = field.dataset.textKeys
+        ? field.dataset.textKeys.split("|").map((k) => k.trim()).filter(Boolean)
+        : field.dataset.textKey
+        ? [field.dataset.textKey]
+        : [];
+      const rawValue = field.value.trim();
+      if (!keys.length) return;
+      if (!rawValue) {
+        keys.forEach((key) => {
+          result[key] = "";
+        });
+        return;
+      }
+
+      if (keys.length === 1) {
+        result[keys[0]] = rawValue;
+        return;
+      }
+
+      const paragraphs = rawValue
+        .split(/\n{2,}/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+      if (paragraphs.length >= keys.length) {
+        keys.slice(0, -1).forEach((key, index) => {
+          result[key] = paragraphs[index] || "";
+        });
+        result[keys[keys.length - 1]] = paragraphs.slice(keys.length - 1).join("\n\n") || "";
+      } else {
+        const lines = rawValue
+          .split(/\n/)
+          .map((part) => part.trim())
+          .filter(Boolean);
+        if (lines.length >= keys.length) {
+          keys.forEach((key, index) => {
+            result[key] = lines[index] || "";
+          });
+        } else {
+          result[keys[0]] = rawValue;
+        }
+      }
     });
     return result;
   }
 
   function renderAdminTextList() {
     if (!adminTextList) return;
-    if (!adminEditLang) adminEditLang = "ru";
+    if (!adminEditLang) adminEditLang = currentLanguage;
     if (adminTextLang) adminTextLang.value = adminEditLang;
     adminTextList.innerHTML = "";
     // Редактируем текст ВЫБРАННОГО в админке языка (а не текущего языка сайта).
@@ -1150,7 +1093,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentCustom = customTextStore[editLang] || {};
     const langTr = translations[editLang] || {};
 
-    adminTextGroups.forEach(({ section, fields }) => {
+    adminTextSections.forEach(({ section, titleKey, bodyKeys }) => {
       const sectionWrap = document.createElement("div");
       sectionWrap.className = "admin-text-section";
 
@@ -1159,32 +1102,49 @@ document.addEventListener("DOMContentLoaded", function () {
       sectionTitle.textContent = section;
       sectionWrap.appendChild(sectionTitle);
 
-      fields.forEach(({ key, label, type }) => {
-        const row = document.createElement("div");
-        row.className = "admin-text-row";
-        const lab = document.createElement("label");
-        lab.textContent = label;
-        lab.htmlFor = `adminTextField_${key}`;
-        // Текущее значение: своё (если задано) → стандартный перевод языка → русский
-        const value = (currentCustom[key] !== undefined && currentCustom[key] !== "")
-          ? currentCustom[key]
-          : (langTr[key] || translations.ru[key] || "");
-        let field;
-        if (type === "area") {
-          field = document.createElement("textarea");
-          field.rows = 3;
-        } else {
-          field = document.createElement("input");
-          field.type = "text";
-        }
-        field.id = `adminTextField_${key}`;
-        field.dataset.textKey = key;
-        field.className = "admin-text-field";
-        field.value = value;
-        row.appendChild(lab);
-        row.appendChild(field);
-        sectionWrap.appendChild(row);
-      });
+      if (titleKey) {
+        const titleRow = document.createElement("div");
+        titleRow.className = "admin-text-row";
+        const titleLabel = document.createElement("label");
+        titleLabel.textContent = "Заголовок";
+        titleLabel.htmlFor = `adminTextField_${titleKey}`;
+        const titleField = document.createElement("input");
+        titleField.id = `adminTextField_${titleKey}`;
+        titleField.type = "text";
+        titleField.dataset.textKey = titleKey;
+        titleField.value =
+          currentCustom[titleKey] ||
+          langTr[titleKey] ||
+          translations.ru[titleKey] ||
+          "";
+        titleField.className = "admin-text-field";
+        titleRow.appendChild(titleLabel);
+        titleRow.appendChild(titleField);
+        sectionWrap.appendChild(titleRow);
+      }
+
+      if (bodyKeys && bodyKeys.length) {
+        const bodyRow = document.createElement("div");
+        bodyRow.className = "admin-text-row";
+        const bodyLabel = document.createElement("label");
+        bodyLabel.textContent = "Основной текст";
+        bodyLabel.htmlFor = `adminTextField_${bodyKeys[0]}`;
+        const bodyField = document.createElement("textarea");
+        bodyField.id = `adminTextField_${bodyKeys[0]}`;
+        bodyField.dataset.textKeys = bodyKeys.join("|");
+        bodyField.rows = 6;
+        bodyField.className = "admin-text-field";
+        bodyField.value = bodyKeys
+          .map(
+            (key) =>
+              currentCustom[key] || langTr[key] || translations.ru[key] || ""
+          )
+          .filter(Boolean)
+          .join("\n\n");
+        bodyRow.appendChild(bodyLabel);
+        bodyRow.appendChild(bodyField);
+        sectionWrap.appendChild(bodyRow);
+      }
 
       adminTextList.appendChild(sectionWrap);
     });
@@ -1378,7 +1338,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Читаем из localStorage картинку поста по индексу (картинки храним отдельно из-за размера)
   function renderAdminProjectsList() {
     if (!adminProjectsList) return;
-    if (!adminEditLang) adminEditLang = "ru";
+    if (!adminEditLang) adminEditLang = currentLanguage;
     adminProjectsList.innerHTML = '';
     const posts = Array.isArray(projectsData) ? projectsData : [];
     posts.forEach((post, index) => {
@@ -1482,48 +1442,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const CONTENT_KEYS = [
     'galleryItems', 'galleryFilters', 'customTexts', 'projects', 'socialLinks',
     'adminHeaderImage', 'adminLeftSidebar', 'adminRightSidebar', 'watermark',
-    'emailjsConfig', 'ntfyTopic',
   ];
-
-  // Собрать весь контент в один объект (строки, как в localStorage)
-  function buildContentPayload() {
-    const data = { _format: 'podvalnia-portfolio', _version: 1 };
-    CONTENT_KEYS.forEach((k) => {
-      const v = localStorage.getItem(k);
-      if (v != null) data[k] = v;
-    });
-    return data;
-  }
-
-  // Применить контент из объекта в localStorage и перерисовать страницу
-  function applyContentPayload(data, { repopulateAdmin } = {}) {
-    if (!data || data._format !== 'podvalnia-portfolio') return false;
-    CONTENT_KEYS.forEach((k) => {
-      if (typeof data[k] === 'string') localStorage.setItem(k, data[k]);
-    });
-    galleryItems = loadGalleryItems();
-    projectsData = loadProjects();
-    const ct = JSON.parse(localStorage.getItem('customTexts') || '{}');
-    Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
-    Object.assign(customTextStore, ct);
-    applyAdminImages();
-    resetGalleryRotation();
-    applyTranslations();
-    renderSocialLinks();
-    renderProjectsFeed();
-    if (repopulateAdmin) populateAdminForm();
-    return true;
-  }
 
   function exportContent() {
     // Сначала зафиксируем текущие правки админки, чтобы экспорт был актуальным
     try { saveAdminSettings(false); } catch (e) { console.warn('pre-export save failed', e); }
-    const data = buildContentPayload();
+    const data = { _format: 'podvalnia-portfolio', _version: 1 };
+    CONTENT_KEYS.forEach((k) => {
+      const v = localStorage.getItem(k);
+      if (v != null) data[k] = v; // храним как строки (как в localStorage)
+    });
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'content.json';
+    a.download = 'portfolio-content.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1537,11 +1470,26 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result.toString());
-        if (!applyContentPayload(data, { repopulateAdmin: true })) {
-          alert('Это не файл контента сайта (content.json).');
+        if (!data || data._format !== 'podvalnia-portfolio') {
+          alert('Это не файл контента сайта (portfolio-content.json).');
           return;
         }
-        alert('Контент загружен.');
+        CONTENT_KEYS.forEach((k) => {
+          if (typeof data[k] === 'string') localStorage.setItem(k, data[k]);
+        });
+        // Перечитываем всё из localStorage и перерисовываем
+        galleryItems = loadGalleryItems();
+        projectsData = loadProjects();
+        const ct = JSON.parse(localStorage.getItem('customTexts') || '{}');
+        Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
+        Object.assign(customTextStore, ct);
+        applyAdminImages();
+        resetGalleryRotation();
+        applyTranslations();
+        renderSocialLinks();
+        renderProjectsFeed();
+        populateAdminForm();
+        alert('Контент импортирован.');
       } catch (e) {
         console.warn('import failed', e);
         alert('Не удалось прочитать файл.');
@@ -1550,116 +1498,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
     reader.readAsText(file);
-  }
-
-  /* =====================================================================
-   * ПУБЛИКАЦИЯ НА САЙТ через GitHub Contents API.
-   * Пишем content.json в репозиторий по личному токену. Сайт при загрузке
-   * читает этот content.json — поэтому изменения видят ВСЕ устройства.
-   * Токен хранится только в localStorage этого браузера и в код сайта не попадает.
-   * ===================================================================== */
-  const GH_CFG_KEY = 'ghPublishConfig';
-  function loadGhConfig() {
-    try { return JSON.parse(localStorage.getItem(GH_CFG_KEY) || '{}'); } catch (e) { return {}; }
-  }
-  function saveGhConfig(cfg) {
-    try { localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
-  }
-  function setPublishStatus(msg, kind) {
-    const el = document.getElementById('adminPublishStatus');
-    if (!el) return;
-    el.textContent = msg || '';
-    el.className = 'admin-publish-status' + (kind ? ' is-' + kind : '');
-  }
-  // base64 для UTF-8 строки (btoa не умеет кириллицу напрямую)
-  function utf8ToBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-
-  async function publishToGitHub() {
-    // Сохраняем текущие правки перед публикацией
-    try { saveAdminSettings(false); } catch (e) {}
-    const owner = document.getElementById('adminGhOwner')?.value.trim();
-    const repo = document.getElementById('adminGhRepo')?.value.trim();
-    const branch = (document.getElementById('adminGhBranch')?.value.trim()) || 'main';
-    const token = document.getElementById('adminGhToken')?.value.trim();
-    if (!owner || !repo || !token) {
-      setPublishStatus('Заполните владельца, репозиторий и токен.', 'error');
-      return;
-    }
-    // Сохраняем настройки (кроме токена показываем, токен тоже храним локально)
-    saveGhConfig({ owner, repo, branch, token });
-
-    const path = 'content.json';
-    const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-    const payload = JSON.stringify(buildContentPayload(), null, 2);
-    const headers = {
-      'Authorization': 'Bearer ' + token,
-      'Accept': 'application/vnd.github+json',
-    };
-
-    setPublishStatus('Публикую…', 'info');
-    try {
-      // 1) узнаём текущий SHA файла (если он уже есть)
-      let sha = undefined;
-      const getRes = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, { headers });
-      if (getRes.status === 200) {
-        const cur = await getRes.json();
-        sha = cur.sha;
-      } else if (getRes.status === 401) {
-        setPublishStatus('Неверный токен (401). Проверьте токен и его права.', 'error');
-        return;
-      } else if (getRes.status === 404) {
-        // файла ещё нет или репозиторий/ветка не найдены — попробуем создать
-        sha = undefined;
-      }
-      // 2) PUT — создаём/обновляем файл
-      const body = {
-        message: 'Обновление контента сайта через админку',
-        content: utf8ToBase64(payload),
-        branch,
-      };
-      if (sha) body.sha = sha;
-      const putRes = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
-      if (putRes.ok) {
-        setPublishStatus('Опубликовано! Сайт обновится у всех за 1–2 минуты.', 'success');
-      } else {
-        const err = await putRes.json().catch(() => ({}));
-        setPublishStatus('Ошибка GitHub (' + putRes.status + '): ' + (err.message || 'см. консоль'), 'error');
-        console.warn('GitHub publish error', putRes.status, err);
-      }
-    } catch (e) {
-      console.warn('publish failed', e);
-      setPublishStatus('Сбой сети при публикации.', 'error');
-    }
-  }
-
-  // При загрузке страницы тянем опубликованный content.json из репозитория.
-  // Это источник истины для всех посетителей. Своя локальная админка не трогается:
-  // опубликованный контент применяем поверх localStorage только для отображения.
-  async function loadPublishedContent() {
-    try {
-      // относительный путь — рядом с index.html в том же репозитории
-      const res = await fetch('content.json?ts=' + (window.__cacheBust || ''), { cache: 'no-store' });
-      if (!res.ok) return false;
-      const data = await res.json();
-      return applyContentPayload(data, { repopulateAdmin: false });
-    } catch (e) {
-      // нет файла или оффлайн — просто используем встроенный контент
-      return false;
-    }
-  }
-
-  function populateGhFields() {
-    const cfg = loadGhConfig();
-    const o = document.getElementById('adminGhOwner');
-    const r = document.getElementById('adminGhRepo');
-    const b = document.getElementById('adminGhBranch');
-    const t = document.getElementById('adminGhToken');
-    if (o) o.value = cfg.owner || '';
-    if (r) r.value = cfg.repo || '';
-    if (b) b.value = cfg.branch || 'main';
-    if (t) t.value = cfg.token || '';
   }
 
   function slugifyFilterLabel(label) {
@@ -2223,31 +2061,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Push-уведомление о новой заявке через ntfy.sh (если задан канал).
-  // Токенов не требует — отправляем простой POST на публичный канал.
-  // Заголовок/текст с кириллицей кладём в тело (UTF-8); в заголовок только ASCII.
-  function sendNtfyNotification(data) {
-    let topic = '';
-    try { topic = (localStorage.getItem('ntfyTopic') || '').trim(); } catch (e) {}
-    if (!topic) return;
-    const body = [
-      '🔔 Новая заявка: ' + (data.work_type || ''),
-      'Имя: ' + (data.from_name || '—'),
-      'Контакт: ' + ((data.contact_method || '') + ' ' + (data.contact || '—')).trim(),
-      data.budget && data.budget !== '—' ? 'Бюджет: ' + data.budget : '',
-      data.deadline && data.deadline !== '—' ? 'Срок: ' + data.deadline : '',
-      '',
-      (data.message || ''),
-    ].filter((l) => l !== '').join('\n');
-    try {
-      fetch('https://ntfy.sh/' + encodeURIComponent(topic), {
-        method: 'POST',
-        headers: { 'Title': 'Podvalnia: new request', 'Tags': 'art,incoming_envelope', 'Priority': 'high' },
-        body: body,
-      }).catch((e) => console.warn('ntfy send failed', e));
-    } catch (e) { console.warn('ntfy error', e); }
-  }
-
   function handleOrderSubmit(event) {
     event.preventDefault();
     if (!orderForm) return;
@@ -2282,9 +2095,6 @@ document.addEventListener("DOMContentLoaded", function () {
       message: orderForm.querySelector('[name="message"]').value.trim(),
       at: new Date().toISOString(),
     };
-
-    // Push-уведомление (ntfy) — независимо от EmailJS
-    sendNtfyNotification(data);
 
     if (orderSubmit) {
       orderSubmit.disabled = true;
@@ -2357,8 +2167,6 @@ document.addEventListener("DOMContentLoaded", function () {
       at: new Date().toISOString(),
     };
 
-    sendNtfyNotification(data);
-
     if (collabSubmit) {
       collabSubmit.disabled = true;
       collabForm.setAttribute("aria-busy", "true");
@@ -2414,13 +2222,11 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("watermark", JSON.stringify(wm));
   }
 
-  const adminNtfyTopic = document.getElementById("adminNtfyTopic");
   function populateEmailjsFields() {
     const cfg = loadEmailjsConfig();
     if (adminEmailjsPublicKey) adminEmailjsPublicKey.value = cfg.publicKey;
     if (adminEmailjsServiceId) adminEmailjsServiceId.value = cfg.serviceId;
     if (adminEmailjsTemplateId) adminEmailjsTemplateId.value = cfg.templateId;
-    if (adminNtfyTopic) adminNtfyTopic.value = localStorage.getItem('ntfyTopic') || '';
   }
   function saveEmailjsConfig() {
     const cfg = {
@@ -2429,7 +2235,6 @@ document.addEventListener("DOMContentLoaded", function () {
       templateId: adminEmailjsTemplateId ? adminEmailjsTemplateId.value.trim() : "",
     };
     localStorage.setItem("emailjsConfig", JSON.stringify(cfg));
-    if (adminNtfyTopic) localStorage.setItem('ntfyTopic', adminNtfyTopic.value.trim());
   }
   function renderAdminOrders() {
     if (!adminOrdersList) return;
@@ -2481,18 +2286,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const lang = button.dataset.lang;
       setLanguage(lang);
     });
-  });
-
-  // Lightbox: закрытие по кнопке, клику по фону и Esc
-  if (lightboxClose) lightboxClose.addEventListener("click", closeLightbox);
-  if (lightbox) {
-    lightbox.addEventListener("click", (ev) => {
-      // закрываем при клике по фону, но не по самой картинке
-      if (ev.target === lightbox || ev.target.classList.contains("lightbox__stage")) closeLightbox();
-    });
-  }
-  document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) closeLightbox();
   });
 
   // Тема
@@ -2644,7 +2437,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (adminTextLang) {
     adminTextLang.addEventListener('change', () => {
       // Сохраним текущие правки текста и постов перед переключением языка
-      const editLang = adminEditLang || "ru";
+      const editLang = adminEditLang || currentLanguage;
       const updated = collectAdminTextOverrides();
       if (!customTextStore[editLang]) customTextStore[editLang] = {};
       Object.assign(customTextStore[editLang], updated);
@@ -2671,11 +2464,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (adminImport && adminImportInput) {
     adminImport.addEventListener('click', () => adminImportInput.click());
     adminImportInput.addEventListener('change', handleImportFile);
-  }
-  // Публикация на сайт через GitHub
-  const adminPublishBtn = document.getElementById('adminPublish');
-  if (adminPublishBtn) {
-    adminPublishBtn.addEventListener('click', publishToGitHub);
   }
 
   try {
@@ -2760,27 +2548,9 @@ document.addEventListener("DOMContentLoaded", function () {
   populateOrderTypeSelect();
   renderProjectsFeed();
   updateLangSwitcher();
-
-  // Подтягиваем опубликованный контент (content.json в репозитории) — источник истины
-  // для всех посетителей. Работает по http(s); на file:// просто пропускается.
-  loadPublishedContent().then((ok) => {
-    if (ok) {
-      // перерисовать всё с опубликованными данными
-      buildFilterButtons();
-      resetGalleryRotation();
-      applyTranslations();
-      renderSocialLinks();
-      renderProjectsFeed();
-      updateLangSwitcher();
-    }
-  });
   // Плашку выбора языка показываем ТОЛЬКО при первом заходе (язык ещё не выбран).
   // После выбора язык сохраняется в localStorage, и при следующих заходах плашки нет.
   if (!localStorage.getItem("siteLanguage")) {
     showLanguageModal();
-    // на первом заходе анимация запустится после выбора языка (в setLanguage)
-  } else {
-    // на повторных заходах плашки нет — запускаем анимацию заголовка сразу
-    playTitleEffects();
   }
 });
