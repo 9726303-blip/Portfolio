@@ -131,6 +131,22 @@ body {
   transition: background var(--t-med) var(--ease), color var(--t-med) var(--ease);
 }
 
+/* Декоративные оранжевые «реки» поверх градиента-подложки (за карточками текста).
+   Зафиксированы во вьюпорте, полупрозрачные — заметные, но не мешают чтению. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -14px; /* чуть больше вьюпорта — у размытия нет резких краёв */
+  z-index: 0;
+  pointer-events: none;
+  background: url("rivers.svg") center center / cover no-repeat;
+  opacity: 0.38;
+  filter: blur(6px);
+}
+[data-theme="dark"] body::before {
+  opacity: 0.32;
+}
+
 /* Заголовки — display-шрифт */
 .hero-title,
 .gallery-intro h2,
