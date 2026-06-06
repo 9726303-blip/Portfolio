@@ -2669,10 +2669,16 @@ main {
   .commission-gallery { grid-template-columns: 1fr; }
 }
 
+/* Текст-абзац под изображениями: больше воздуха сверху и снизу */
+.section-midtext {
+  margin: clamp(26px, 4.5vw, 44px) 0;
+}
+
 /* ===== Контакты для ЛС внизу блоков «Заказать»/«Сотрудничество» ===== */
+/* Меньше отступа между шаблоном и контактами */
 .section-contact {
-  margin-top: 26px;
-  padding-top: 18px;
+  margin-top: 12px;
+  padding-top: 16px;
   border-top: 1px solid var(--card-border);
 }
 .section-contact__title {
@@ -2687,6 +2693,7 @@ main {
   flex-wrap: wrap;
   gap: 12px;
 }
+/* Кнопки контактов — тёплая фирменная гамма сайта (как у CTA), а не синие бренд-цвета */
 .section-contact__btn {
   display: inline-flex;
   align-items: center;
@@ -2695,15 +2702,13 @@ main {
   border-radius: 999px;
   font-weight: 700;
   text-decoration: none;
-  color: #fff;
-  background: var(--surface-strong);
-  box-shadow: 0 10px 22px rgba(122, 68, 10, 0.2);
+  color: #fff7e9;
+  background: linear-gradient(135deg, var(--surface-strong) 0%, #8f2e07 100%);
+  box-shadow: 0 10px 22px rgba(122, 68, 10, 0.24);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   transition: transform var(--t-fast) var(--ease), filter var(--t-fast) var(--ease);
 }
 .section-contact__btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
-.section-contact__btn--discord { background: #5865f2; }
-.section-contact__btn--vk { background: #0077ff; }
-.section-contact__btn--telegram { background: #2aabee; }
 
 /* Контакты в админке (Discord/VK/Telegram) */
 .admin-contact-links { display: grid; gap: 8px; }
