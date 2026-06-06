@@ -1869,6 +1869,8 @@ main {
 /* Запрет выделения и перетаскивания работ в галерее */
 .art-card,
 .art-card img,
+.commission-item,
+.commission-item img,
 .side-panel-image,
 .hero-bg-image {
   -webkit-user-select: none;
@@ -1878,6 +1880,7 @@ main {
   -webkit-touch-callout: none; /* iOS: запрет долгого тапа «сохранить» */
 }
 .art-card img,
+.commission-item img,
 .side-panel-image,
 .hero-bg-image {
   pointer-events: none; /* клик/контекст-меню не попадают в сам <img> */
@@ -2558,5 +2561,179 @@ main {
   .admin-project-row { grid-template-columns: 1fr; }
   .admin-project-preview { width: 100%; height: 160px; }
   .admin-social-row { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   Блоки «Заказать»/«Сотрудничество»: копируемый шаблон + примеры работ
+   ===================================================================== */
+.section-template {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 22px 0 6px;
+}
+.copy-template {
+  width: 100%;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1vw, 1.05rem);
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: 0 10px 26px rgba(122, 68, 10, 0.12);
+}
+.copy-template:empty { display: none; }
+.copy-template-btn { align-self: flex-start; }
+.copy-template-status {
+  font-weight: 700;
+  color: var(--surface-strong);
+  min-height: 1.2em;
+}
+[data-theme="dark"] .copy-template-status { color: var(--accent); }
+
+.section-examples { margin-top: 26px; }
+.section-examples:has(.commission-gallery:empty) { display: none; }
+.section-examples__title {
+  margin: 0 0 14px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--surface-strong);
+}
+[data-theme="dark"] .section-examples__title { color: var(--accent); }
+
+/* Примеры работ: по 2 в ряд, КРУПНЫЕ и БЕЗ обрезки (object-fit: contain) */
+.commission-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: start;
+  gap: clamp(12px, 1.6vw, 20px);
+}
+.commission-gallery:empty { display: none; }
+.commission-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+  cursor: zoom-in;
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease);
+}
+[data-theme="dark"] .commission-item { background: rgba(0, 0, 0, 0.28); }
+.commission-item:hover { transform: translateY(-4px); box-shadow: 0 30px 70px rgba(88, 46, 17, 0.3); }
+.commission-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  object-fit: contain;
+}
+.commission-guard {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* Админка: миниатюры примеров работ */
+.admin-section-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.admin-section-images:empty { display: none; }
+.admin-section-image {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  background: var(--field-bg);
+}
+.admin-section-image img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* На узких телефонах примеры — в один столбец (крупнее) */
+@media (max-width: 560px) {
+  .commission-gallery { grid-template-columns: 1fr; }
+}
+
+/* ===== Контакты для ЛС внизу блоков «Заказать»/«Сотрудничество» ===== */
+.section-contact {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--card-border);
+}
+.section-contact__title {
+  margin: 0 0 12px;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  color: var(--surface-strong);
+}
+[data-theme="dark"] .section-contact__title { color: var(--accent); }
+.section-contact__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.section-contact__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+  background: var(--surface-strong);
+  box-shadow: 0 10px 22px rgba(122, 68, 10, 0.2);
+  transition: transform var(--t-fast) var(--ease), filter var(--t-fast) var(--ease);
+}
+.section-contact__btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.section-contact__btn--discord { background: #5865f2; }
+.section-contact__btn--vk { background: #0077ff; }
+.section-contact__btn--telegram { background: #2aabee; }
+
+/* Контакты в админке (Discord/VK/Telegram) */
+.admin-contact-links { display: grid; gap: 8px; }
+.admin-contact-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+.admin-contact-row > span { font-weight: 700; color: #3b2c1e; }
+[data-theme="dark"] .admin-contact-row > span { color: var(--text); }
+.admin-contact-row input {
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 9px 12px;
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+/* Гарантируем выделение/вставку в полях ввода админки и модалок
+   (защита контента не должна мешать paste/выделению). */
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select,
+.password-modal input,
+.copy-template {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 

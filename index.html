@@ -109,59 +109,26 @@
           <h2 data-i18n="order_title">Заказать коммишку</h2>
           <p data-i18n="order_p1">Опишите идею, настроение и формат — я превращу её в тёплое цифровое произведение с цветочными и листовыми мотивами.</p>
 
-          <form id="orderForm" class="order-form" aria-describedby="orderStatus">
-            <!-- Honeypot: вне экрана, скрыт от людей, ловит ботов. Не type=hidden и не display:none. -->
-            <div class="order-hp" aria-hidden="true">
-              <label for="orderHp">Не заполняйте это поле</label>
-              <input id="orderHp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
-            </div>
+          <!-- Прайс: картинки НАД текстом, крупные и без обрезки, по 2 в ряд -->
+          <div class="section-examples">
+            <p class="section-examples__title" data-i18n="order_images_title">Прайс</p>
+            <div class="commission-gallery" id="orderGallery" aria-label="Прайс"></div>
+          </div>
 
-            <div class="order-grid">
-              <div class="order-field">
-                <label for="orderName" data-i18n="order_form_name">Имя</label>
-                <input id="orderName" name="from_name" type="text" required autocomplete="name" />
-              </div>
-              <div class="order-field order-field--contact">
-                <label for="orderContact" data-i18n="order_form_contact_label">Как с вами связаться</label>
-                <div class="contact-input">
-                  <select id="orderContactMethod" name="contact_method" aria-label="Способ связи">
-                    <option value="email" data-i18n="order_form_contact_email">Email</option>
-                    <option value="discord" data-i18n="order_form_contact_discord">Discord</option>
-                    <option value="telegram" data-i18n="order_form_contact_telegram">Telegram</option>
-                  </select>
-                  <input id="orderContact" name="contact" type="text" required autocomplete="email" placeholder="you@example.com" />
-                </div>
-                <!-- Для письма EmailJS: Reply-To заполняется только если выбран Email -->
-                <input id="orderReplyTo" name="reply_to" type="hidden" value="" />
-              </div>
-              <div class="order-field">
-                <label for="orderType" data-i18n="order_form_type">Тип работы</label>
-                <select id="orderType" name="work_type"></select>
-              </div>
-              <div class="order-field">
-                <label for="orderBudget" data-i18n="order_form_budget">Бюджет (необязательно)</label>
-                <input id="orderBudget" name="budget" type="text" placeholder="напр. 2000–4000 ₽" />
-              </div>
-              <div class="order-field">
-                <label for="orderDeadline" data-i18n="order_form_deadline">Желаемый срок (необязательно)</label>
-                <input id="orderDeadline" name="deadline" type="date" />
-              </div>
-              <div class="order-field order-field--full">
-                <label for="orderMessage" data-i18n="order_form_desc">Опишите идею</label>
-                <textarea id="orderMessage" name="message" rows="5" required placeholder="Сюжет, настроение, референсы, формат…"></textarea>
-              </div>
-            </div>
+          <p class="section-midtext" data-i18n="order_p2">Напишите свои пожелания, и я предложу лучший вариант исполнения.</p>
 
-            <label class="order-consent">
-              <input id="orderConsent" name="consent" type="checkbox" required />
-              <span data-i18n="order_form_consent">Согласен(на) на обработку данных для ответа на заявку</span>
-            </label>
+          <!-- Шаблон заявки: копируется одной кнопкой, заполняется и отправляется мне в ЛС -->
+          <div class="section-template">
+            <pre class="copy-template" id="orderTemplate" data-i18n="order_template" aria-label="Шаблон заявки на коммишку"></pre>
+            <button type="button" class="cta-button copy-template-btn" id="orderCopyBtn" data-i18n="copy_template_btn">Скопировать шаблон</button>
+            <span class="copy-template-status" id="orderCopyStatus" role="status" aria-live="polite"></span>
+          </div>
 
-            <div class="order-actions">
-              <button type="submit" id="orderSubmit" class="cta-button" data-i18n="order_form_submit">Отправить заявку</button>
-              <p class="order-status" id="orderStatus" role="status" aria-live="polite"></p>
-            </div>
-          </form>
+          <!-- Контакты для личных сообщений -->
+          <div class="section-contact">
+            <p class="section-contact__title" data-i18n="contact_dm_title">Напишите мне в личные сообщения:</p>
+            <div class="section-contact__links" id="orderContactLinks"></div>
+          </div>
         </div>
       </section>
 
@@ -177,48 +144,25 @@
         <div class="info-card info-card--collab info-card--order">
           <h2 data-i18n="collab_title">Предложить сотрудничество</h2>
           <p data-i18n="collab_p1">Ищу проекты, где можно добавить лёгкую магию с помощью диджитал-арта. Буду рада сделать работу для бренда, игры, издательства или кампании.</p>
-          <p data-i18n="collab_p2">Оставь запрос, и я отвечу с предварительной идеей и примерными сроками.</p>
+          <!-- Карта сотрудничества: картинки НАД текстом, по 2 в ряд, без обрезки -->
+          <div class="section-examples">
+            <p class="section-examples__title" data-i18n="collab_images_title">Карта сотрудничества</p>
+            <div class="commission-gallery" id="collabGallery" aria-label="Карта сотрудничества"></div>
+          </div>
 
-          <form id="collabForm" class="order-form" aria-describedby="collabStatus">
-            <!-- Honeypot против ботов -->
-            <div class="order-hp" aria-hidden="true">
-              <label for="collabHp">Не заполняйте это поле</label>
-              <input id="collabHp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
-            </div>
+          <p class="section-midtext" data-i18n="collab_p2">Оставь запрос, и я отвечу с предварительной идеей и примерными сроками.</p>
 
-            <div class="order-grid">
-              <div class="order-field">
-                <label for="collabName" data-i18n="order_form_name">Имя / компания</label>
-                <input id="collabName" name="from_name" type="text" required autocomplete="name" />
-              </div>
-              <div class="order-field order-field--contact">
-                <label for="collabContact" data-i18n="order_form_contact_label">Как с вами связаться</label>
-                <div class="contact-input">
-                  <select id="collabContactMethod" name="contact_method" aria-label="Способ связи">
-                    <option value="email" data-i18n="order_form_contact_email">Email</option>
-                    <option value="discord" data-i18n="order_form_contact_discord">Discord</option>
-                    <option value="telegram" data-i18n="order_form_contact_telegram">Telegram</option>
-                  </select>
-                  <input id="collabContact" name="contact" type="text" required autocomplete="email" placeholder="you@example.com" />
-                </div>
-                <input id="collabReplyTo" name="reply_to" type="hidden" value="" />
-              </div>
-              <div class="order-field order-field--full">
-                <label for="collabMessage" data-i18n="collab_form_desc">Опишите предложение</label>
-                <textarea id="collabMessage" name="message" rows="5" required placeholder="Проект, формат сотрудничества, сроки, бюджет…"></textarea>
-              </div>
-            </div>
+          <div class="section-template">
+            <pre class="copy-template" id="collabTemplate" data-i18n="collab_template" aria-label="Шаблон предложения о сотрудничестве"></pre>
+            <button type="button" class="cta-button copy-template-btn" id="collabCopyBtn" data-i18n="copy_template_btn">Скопировать шаблон</button>
+            <span class="copy-template-status" id="collabCopyStatus" role="status" aria-live="polite"></span>
+          </div>
 
-            <label class="order-consent">
-              <input id="collabConsent" name="consent" type="checkbox" required />
-              <span data-i18n="order_form_consent">Согласен(на) на обработку данных для ответа на заявку</span>
-            </label>
-
-            <div class="order-actions">
-              <button type="submit" id="collabSubmit" class="cta-button" data-i18n="collab_form_submit">Отправить предложение</button>
-              <p class="order-status" id="collabStatus" role="status" aria-live="polite"></p>
-            </div>
-          </form>
+          <!-- Контакты для личных сообщений -->
+          <div class="section-contact">
+            <p class="section-contact__title" data-i18n="contact_dm_title">Напишите мне в личные сообщения:</p>
+            <div class="section-contact__links" id="collabContactLinks"></div>
+          </div>
         </div>
       </section>
 
@@ -356,10 +300,20 @@
         </div>
 
         <div class="admin-field">
-          <label>Социальные сети</label>
+          <label>Социальные сети (подвал сайта)</label>
           <div id="adminSocialLinks" class="admin-social-links"></div>
           <button type="button" id="adminAddSocial" class="admin-button admin-social-add">Добавить соцсеть</button>
           <p class="admin-help">Меняйте название и ссылку для кнопок соцсетей в подвале. Можно добавить до 10 кнопок: «Добавить соцсеть» создаёт новую ячейку, «Удалить» убирает. Не забудьте «Применить» или «Сохранить».</p>
+        </div>
+
+        <div class="admin-field">
+          <label>Контакты для личных сообщений (под блоками «Заказать»/«Сотрудничество»)</label>
+          <div class="admin-contact-links">
+            <label class="admin-contact-row"><span>Discord</span><input id="adminContactDiscord" type="text" placeholder="Ссылка на Discord (https://…)" autocomplete="off" /></label>
+            <label class="admin-contact-row"><span>VK</span><input id="adminContactVk" type="text" placeholder="Ссылка на VK (https://…)" autocomplete="off" /></label>
+            <label class="admin-contact-row"><span>Telegram</span><input id="adminContactTelegram" type="text" placeholder="Ссылка на Telegram (https://…)" autocomplete="off" /></label>
+          </div>
+          <p class="admin-help">Эти ссылки показываются жирной строкой «Напишите мне в личные сообщения:» внизу блоков «Заказать» и «Сотрудничество». Пустые поля просто не показываются. Вставляйте ссылку как обычно (Ctrl+V или долгий тап → «Вставить»).</p>
         </div>
 
         <div class="admin-field">
@@ -373,26 +327,17 @@
         </div>
 
         <div class="admin-field">
-          <label>Настройки приёма заявок (EmailJS)</label>
-          <div class="admin-emailjs">
-            <input id="adminEmailjsPublicKey" type="text" placeholder="EmailJS Public Key" autocomplete="off" />
-            <input id="adminEmailjsServiceId" type="text" placeholder="Service ID" autocomplete="off" />
-            <input id="adminEmailjsTemplateId" type="text" placeholder="Template ID" autocomplete="off" />
-          </div>
-          <p class="admin-help">Заведите бесплатный аккаунт на emailjs.com, создайте сервис и шаблон. В шаблоне используйте переменные: <code>{{from_name}}</code>, <code>{{contact_method}}</code>, <code>{{contact}}</code>, <code>{{reply_to}}</code>, <code>{{work_type}}</code>, <code>{{message}}</code>, <code>{{budget}}</code>, <code>{{deadline}}</code>. Reply-To поставьте = <code>{{reply_to}}</code> (заполняется автоматически, только если заказчик выбрал Email — для Discord/Telegram пишите по полю <code>{{contact}}</code>). Пока ключи не заданы, заявки сохраняются здесь, в админке.</p>
+          <label>Примеры работ в блоке «Заказать» (до 6)</label>
+          <div id="adminOrderImagesList" class="admin-section-images"></div>
+          <button type="button" id="adminAddOrderImage" class="admin-button">Добавить изображение</button>
+          <p class="admin-help">Крупные изображения-примеры в блоке «Заказать коммишку» — показываются по 2 в ряд и НЕ обрезаются. До 6 штук. Сохраняются сразу. Изображения автоматически сжимаются, чтобы не перегружать сайт.</p>
         </div>
 
         <div class="admin-field">
-          <label for="adminNtfyTopic">Push-уведомления о заявках (ntfy.sh)</label>
-          <input id="adminNtfyTopic" type="text" placeholder="Имя канала, напр. podvalnia-zayavki-7x9k" autocomplete="off" />
-          <p class="admin-help">Придумайте уникальное секретное имя канала и впишите сюда. Установите приложение <b>ntfy</b> (Android/iOS) или откройте <code>ntfy.sh</code> в браузере и подпишитесь на этот же канал. Каждая новая заявка будет приходить вам push-уведомлением. Имя держите в секрете — кто его знает, тот видит уведомления.</p>
-        </div>
-
-        <div class="admin-field">
-          <label>Полученные заявки</label>
-          <div id="adminOrdersList" class="admin-orders-list"></div>
-          <button type="button" id="adminClearOrders" class="admin-button admin-button--secondary">Очистить заявки</button>
-          <p class="admin-help">Заявки, сохранённые локально (когда EmailJS не настроен или письмо не ушло).</p>
+          <label>Примеры работ в блоке «Сотрудничество» (до 6)</label>
+          <div id="adminCollabImagesList" class="admin-section-images"></div>
+          <button type="button" id="adminAddCollabImage" class="admin-button">Добавить изображение</button>
+          <p class="admin-help">Крупные изображения-примеры в блоке «Предложить сотрудничество» — по 2 в ряд, без обрезки. До 6 штук. Сохраняются сразу.</p>
         </div>
 
         <div class="admin-field">
@@ -450,8 +395,6 @@
   <!-- Уведомление о защите авторских прав -->
   <div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
 
-  <!-- EmailJS SDK (для отправки формы заказа на email). Не инициализируется без ключей. -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

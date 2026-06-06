@@ -157,30 +157,22 @@ document.addEventListener("DOMContentLoaded", function () {
       section: "Блок «Заказать»",
       fields: [
         { key: "order_title", label: "Заголовок" },
-        { key: "order_p1", label: "Описание блока", type: "area" },
-        { key: "order_form_name", label: "Поле «Имя»" },
-        { key: "order_form_contact_label", label: "Поле «Как связаться»" },
-        { key: "order_form_type", label: "Поле «Тип работы»" },
-        { key: "order_form_type_any", label: "Вариант «Любой/уточним»" },
-        { key: "order_form_budget", label: "Поле «Бюджет»" },
-        { key: "order_form_deadline", label: "Поле «Срок»" },
-        { key: "order_form_desc", label: "Поле «Опишите идею»" },
-        { key: "order_form_consent", label: "Текст согласия", type: "area" },
-        { key: "order_form_submit", label: "Кнопка отправки" },
-        { key: "order_form_sending", label: "Статус «Отправляем…»" },
-        { key: "order_form_success", label: "Статус «Успех»", type: "area" },
-        { key: "order_form_error", label: "Статус «Ошибка»", type: "area" },
-        { key: "order_form_saved", label: "Статус «Сохранено»", type: "area" },
+        { key: "order_p1", label: "Текст над прайсом", type: "area" },
+        { key: "order_images_title", label: "Подпись над прайсом" },
+        { key: "order_p2", label: "Текст под прайсом (над шаблоном)", type: "area" },
+        { key: "order_template", label: "Шаблон заявки (копируется кнопкой)", type: "area" },
+        { key: "copy_template_btn", label: "Кнопка «Скопировать шаблон»" },
+        { key: "contact_dm_title", label: "Подпись «Напишите мне в ЛС»" },
       ],
     },
     {
       section: "Блок «Сотрудничество»",
       fields: [
         { key: "collab_title", label: "Заголовок" },
-        { key: "collab_p1", label: "Текст 1", type: "area" },
-        { key: "collab_p2", label: "Текст 2", type: "area" },
-        { key: "collab_form_desc", label: "Поле «Опишите предложение»" },
-        { key: "collab_form_submit", label: "Кнопка отправки" },
+        { key: "collab_p1", label: "Текст над картой сотрудничества", type: "area" },
+        { key: "collab_images_title", label: "Подпись над картой сотрудничества" },
+        { key: "collab_p2", label: "Текст под картой (над шаблоном)", type: "area" },
+        { key: "collab_template", label: "Шаблон предложения (копируется кнопкой)", type: "area" },
       ],
     },
     {
@@ -574,6 +566,60 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
+  // Дефолтные подписи блоков «Заказать»/«Сотрудничество»: шаблоны заявок (копируются кнопкой),
+  // подпись кнопки и заголовок примеров. Вшиваем в translations, чтобы работали getText,
+  // переключение языка и редактирование в админке (раздел «Редактирование текста»).
+  const SECTION_TEXT_DEFAULTS = {
+    ru: {
+      order_template: "Здравствуйте! Хочу заказать коммишку 🎨\n\n• Имя/ник: \n• Тип работы: \n• Описание идеи: \n• Референсы (ссылки): \n• Бюджет: \n• Желаемый срок: \n• Как со мной связаться: ",
+      collab_template: "Здравствуйте! Есть предложение о сотрудничестве 🤝\n\n• Имя / компания: \n• О проекте: \n• Формат сотрудничества: \n• Сроки: \n• Бюджет: \n• Контакты для связи: ",
+      copy_template_btn: "Скопировать шаблон",
+      copy_template_done: "Скопировано ✓",
+      order_images_title: "Прайс",
+      collab_images_title: "Карта сотрудничества",
+      contact_dm_title: "Напишите мне в личные сообщения:",
+    },
+    en: {
+      order_template: "Hello! I'd like to order a commission 🎨\n\n• Name/nick: \n• Type of work: \n• Idea description: \n• References (links): \n• Budget: \n• Desired deadline: \n• How to reach me: ",
+      collab_template: "Hello! I have a collaboration proposal 🤝\n\n• Name / company: \n• About the project: \n• Type of collaboration: \n• Timeline: \n• Budget: \n• Contact details: ",
+      copy_template_btn: "Copy template",
+      copy_template_done: "Copied ✓",
+      order_images_title: "Price list",
+      collab_images_title: "Collaboration guide",
+      contact_dm_title: "Message me directly:",
+    },
+    es: {
+      order_template: "¡Hola! Quiero encargar una comisión 🎨\n\n• Nombre/apodo: \n• Tipo de trabajo: \n• Descripción de la idea: \n• Referencias (enlaces): \n• Presupuesto: \n• Plazo deseado: \n• Cómo contactarme: ",
+      collab_template: "¡Hola! Tengo una propuesta de colaboración 🤝\n\n• Nombre / empresa: \n• Sobre el proyecto: \n• Tipo de colaboración: \n• Plazos: \n• Presupuesto: \n• Datos de contacto: ",
+      copy_template_btn: "Copiar plantilla",
+      copy_template_done: "¡Copiado! ✓",
+      order_images_title: "Lista de precios",
+      collab_images_title: "Guía de colaboración",
+      contact_dm_title: "Escríbeme por privado:",
+    },
+    zh: {
+      order_template: "你好！我想委托一幅作品 🎨\n\n• 称呼： \n• 作品类型： \n• 创意描述： \n• 参考（链接）： \n• 预算： \n• 期望完成时间： \n• 如何联系我： ",
+      collab_template: "你好！我有一个合作提议 🤝\n\n• 姓名/公司： \n• 关于项目： \n• 合作方式： \n• 时间安排： \n• 预算： \n• 联系方式： ",
+      copy_template_btn: "复制模板",
+      copy_template_done: "已复制 ✓",
+      order_images_title: "价格表",
+      collab_images_title: "合作方案",
+      contact_dm_title: "私信联系我：",
+    },
+    ko: {
+      order_template: "안녕하세요! 커미션을 의뢰하고 싶어요 🎨\n\n• 이름/닉네임: \n• 작업 종류: \n• 아이디어 설명: \n• 레퍼런스(링크): \n• 예산: \n• 희망 마감일: \n• 연락 방법: ",
+      collab_template: "안녕하세요! 협업을 제안하고 싶어요 🤝\n\n• 이름 / 회사: \n• 프로젝트 소개: \n• 협업 형태: \n• 일정: \n• 예산: \n• 연락처: ",
+      copy_template_btn: "템플릿 복사",
+      copy_template_done: "복사됨 ✓",
+      order_images_title: "가격표",
+      collab_images_title: "협업 안내",
+      contact_dm_title: "개인 메시지로 연락주세요:",
+    },
+  };
+  SUPPORTED_LANGS.forEach((lang) => {
+    if (translations[lang]) Object.assign(translations[lang], SECTION_TEXT_DEFAULTS[lang] || {});
+  });
+
   let currentLanguage = localStorage.getItem("siteLanguage") || "ru";
   const customTextStore = JSON.parse(localStorage.getItem("customTexts") || "{}");
 
@@ -605,8 +651,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     try { buildFilterButtons(); } catch (e) { console.error("Filter rebuild error:", e); }
     try { renderSocialLinks(); } catch (e) { console.error('social render error', e); }
-    try { populateOrderTypeSelect(); } catch (e) { console.error('order select error', e); }
-    try { updateContactFieldUI(); } catch (e) { console.error('contact field error', e); }
+    try { renderSectionImagesPublic(); } catch (e) { console.error('section images error', e); }
+    try { renderContactLinksPublic(); } catch (e) { console.error('contact links error', e); }
     try { renderProjectsFeed(); } catch (e) { console.error('projects feed error', e); }
   }
 
@@ -952,11 +998,53 @@ document.addEventListener("DOMContentLoaded", function () {
     if (rightValue) rightSidebarImage.src = rightValue;
   }
 
+  // Сжатие загружаемых картинок: уменьшаем до maxDim по длинной стороне и кодируем в JPEG,
+  // чтобы тяжёлые фото не раздували localStorage и не тормозили сайт. Прозрачный фон
+  // заливаем белым (иначе JPEG сделает его чёрным). При любой ошибке — отдаём оригинал.
+  function compressImageFile(file, maxDim, quality) {
+    return new Promise((resolve, reject) => {
+      if (!file) { reject(new Error('no file')); return; }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const src = e.target?.result?.toString() || '';
+        const img = new Image();
+        img.onload = () => {
+          try {
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            if (!w || !h) { resolve(src); return; }
+            const md = maxDim || 1600;
+            if (Math.max(w, h) > md) {
+              const s = md / Math.max(w, h);
+              w = Math.round(w * s);
+              h = Math.round(h * s);
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            const out = canvas.toDataURL('image/jpeg', quality || 0.82);
+            resolve(out && out.length > 16 ? out : src);
+          } catch (err) {
+            console.warn('image compress failed, using original', err);
+            resolve(src);
+          }
+        };
+        img.onerror = () => resolve(src);
+        img.src = src;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   function handleImageUpload(file, targetId, previewId, storageKey) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result?.toString() || '';
+    const maxDim = targetId === 'header' ? 1920 : 1400;
+    compressImageFile(file, maxDim, 0.84).then((dataUrl) => {
       localStorage.setItem(storageKey, dataUrl);
       // Update the displayed image
       if (targetId === 'header') {
@@ -973,8 +1061,7 @@ document.addEventListener("DOMContentLoaded", function () {
           preview.innerHTML = `<img src="${dataUrl}" alt="preview" style="max-width: 100%; max-height: 150px;">`;
         }
       }
-    };
-    reader.readAsDataURL(file);
+    }).catch((err) => console.warn('header/sidebar upload failed', err));
   }
 
   function openAdminPanel() {
@@ -1007,9 +1094,9 @@ document.addEventListener("DOMContentLoaded", function () {
     renderAdminTextList();
     renderAdminSocialList();
     renderAdminProjectsList();
-    populateEmailjsFields();
+    renderAdminSectionImagesAll();
+    populateContactLinkFields();
     populateWatermarkFields();
-    renderAdminOrders();
     populateGhFields();
   }
 
@@ -1093,8 +1180,8 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem('projects', JSON.stringify(projectsData));
     } catch (e) { console.warn('save projects failed', e); }
 
-    try { saveEmailjsConfig(); } catch (e) { console.warn('save emailjs config failed', e); }
     try { saveWatermarkSettings(); } catch (e) { console.warn('save watermark failed', e); }
+    try { saveContactLinks(); } catch (e) { console.warn('save contact links failed', e); }
 
     if (adminNewPassword) adminNewPassword.value = '';
     if (adminConfirmPassword) adminConfirmPassword.value = '';
@@ -1322,6 +1409,185 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* =====================================================================
+   * ПРИМЕРЫ РАБОТ в блоках «Заказать»/«Сотрудничество» (крупные, без обрезки)
+   * + копируемые шаблоны заявок (вместо форм).
+   * ===================================================================== */
+  const adminOrderImagesList = document.getElementById('adminOrderImagesList');
+  const adminCollabImagesList = document.getElementById('adminCollabImagesList');
+  const adminAddOrderImage = document.getElementById('adminAddOrderImage');
+  const adminAddCollabImage = document.getElementById('adminAddCollabImage');
+
+  function loadSectionImages(key) {
+    try {
+      const a = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(a) ? a.filter((x) => x && x.image) : [];
+    } catch (e) { return []; }
+  }
+
+  // Публичный рендер примеров (по 2 в ряд, без обрезки; клик — просмотр в lightbox)
+  function renderSectionImages(container, key) {
+    if (!container) return;
+    const imgs = loadSectionImages(key).slice(0, 6);
+    container.innerHTML = '';
+    // Прячем заголовок «Примеры работ», если изображений нет
+    const section = container.closest('.section-examples');
+    if (section) section.style.display = imgs.length ? '' : 'none';
+    imgs.forEach((it) => {
+      const item = document.createElement('div');
+      item.className = 'commission-item';
+      const img = document.createElement('img');
+      img.src = it.image;
+      img.alt = it.alt || '';
+      img.loading = 'lazy';
+      img.draggable = false;
+      item.appendChild(img);
+      const guard = document.createElement('div');
+      guard.className = 'commission-guard';
+      guard.addEventListener('click', () => openLightbox(it.image, it.alt || ''));
+      item.appendChild(guard);
+      container.appendChild(item);
+    });
+  }
+  function renderSectionImagesPublic() {
+    renderSectionImages(document.getElementById('orderGallery'), 'orderImages');
+    renderSectionImages(document.getElementById('collabGallery'), 'collabImages');
+  }
+
+  // Админка: управление примерами (до 6), сразу пишем в localStorage
+  function renderAdminSectionImages(listEl, key, addBtn) {
+    if (!listEl) return;
+    const imgs = loadSectionImages(key);
+    listEl.innerHTML = '';
+    imgs.forEach((it, idx) => {
+      const row = document.createElement('div');
+      row.className = 'admin-section-image';
+      const img = document.createElement('img');
+      img.src = it.image || '';
+      img.alt = '';
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'admin-button admin-button--secondary';
+      rm.textContent = 'Удалить';
+      rm.addEventListener('click', () => {
+        const arr = loadSectionImages(key);
+        arr.splice(idx, 1);
+        localStorage.setItem(key, JSON.stringify(arr));
+        renderAdminSectionImagesAll();
+        renderSectionImagesPublic();
+      });
+      row.appendChild(img);
+      row.appendChild(rm);
+      listEl.appendChild(row);
+    });
+    if (addBtn) {
+      addBtn.disabled = imgs.length >= 6;
+      addBtn.textContent = imgs.length >= 6 ? 'Максимум 6 изображений' : 'Добавить изображение';
+    }
+  }
+  function renderAdminSectionImagesAll() {
+    renderAdminSectionImages(adminOrderImagesList, 'orderImages', adminAddOrderImage);
+    renderAdminSectionImages(adminCollabImagesList, 'collabImages', adminAddCollabImage);
+  }
+  function openSectionImagePicker(mode) {
+    if (loadSectionImages(mode).length >= 6) { alert('Можно добавить максимум 6 изображений.'); return; }
+    if (adminGalleryFileInput) {
+      adminGalleryFileInput.dataset.mode = mode;
+      adminGalleryFileInput.value = '';
+      adminGalleryFileInput.click();
+    }
+  }
+
+  // Копирование шаблона заявки/предложения по клику (вместо отправки формы)
+  function fallbackCopyText(text, done) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (done) done();
+    } catch (e) { console.warn('copy failed', e); }
+  }
+  function copyTemplate(textKey, statusEl) {
+    const text = getText(textKey) || '';
+    if (!text) return;
+    const done = () => {
+      if (statusEl) {
+        statusEl.textContent = getText('copy_template_done') || 'Скопировано ✓';
+        setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500);
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopyText(text, done));
+    } else {
+      fallbackCopyText(text, done);
+    }
+  }
+
+  // Контакты для ЛС (Discord/VK/Telegram) — жирная строка внизу блоков Заказать/Сотрудничество
+  const adminContactDiscord = document.getElementById('adminContactDiscord');
+  const adminContactVk = document.getElementById('adminContactVk');
+  const adminContactTelegram = document.getElementById('adminContactTelegram');
+  const CONTACT_PLATFORMS = [
+    { key: 'discord', label: 'Discord' },
+    { key: 'vk', label: 'VK' },
+    { key: 'telegram', label: 'Telegram' },
+  ];
+
+  function loadContactLinks() {
+    try {
+      const c = JSON.parse(localStorage.getItem('contactLinks') || '{}');
+      return {
+        discord: (c.discord || '').trim(),
+        vk: (c.vk || '').trim(),
+        telegram: (c.telegram || '').trim(),
+      };
+    } catch (e) { return { discord: '', vk: '', telegram: '' }; }
+  }
+  function renderContactLinksInto(container) {
+    if (!container) return;
+    const links = loadContactLinks();
+    container.innerHTML = '';
+    let count = 0;
+    CONTACT_PLATFORMS.forEach((p) => {
+      const url = links[p.key];
+      if (!url) return;
+      const a = document.createElement('a');
+      a.className = 'section-contact__btn section-contact__btn--' + p.key;
+      a.href = normalizeUrl(url);
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = p.label;
+      container.appendChild(a);
+      count++;
+    });
+    const wrap = container.closest('.section-contact');
+    if (wrap) wrap.style.display = count ? '' : 'none';
+  }
+  function renderContactLinksPublic() {
+    renderContactLinksInto(document.getElementById('orderContactLinks'));
+    renderContactLinksInto(document.getElementById('collabContactLinks'));
+  }
+  function populateContactLinkFields() {
+    const links = loadContactLinks();
+    if (adminContactDiscord) adminContactDiscord.value = links.discord;
+    if (adminContactVk) adminContactVk.value = links.vk;
+    if (adminContactTelegram) adminContactTelegram.value = links.telegram;
+  }
+  function saveContactLinks() {
+    const links = {
+      discord: adminContactDiscord ? adminContactDiscord.value.trim() : '',
+      vk: adminContactVk ? adminContactVk.value.trim() : '',
+      telegram: adminContactTelegram ? adminContactTelegram.value.trim() : '',
+    };
+    localStorage.setItem('contactLinks', JSON.stringify(links));
+  }
+
+  /* =====================================================================
    * ПРОЕКТЫ (посты): картинка + дата + подпись на каждом языке
    * ===================================================================== */
   function loadProjects() {
@@ -1511,7 +1777,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const CONTENT_KEYS = [
     'galleryItems', 'galleryFilters', 'customTexts', 'projects', 'socialLinks',
     'adminHeaderImage', 'adminLeftSidebar', 'adminRightSidebar', 'watermark',
-    'emailjsConfig', 'ntfyTopic',
+    'orderImages', 'collabImages', 'contactLinks',
   ];
 
   // Собрать весь контент в один объект (строки, как в localStorage)
@@ -1540,6 +1806,7 @@ document.addEventListener("DOMContentLoaded", function () {
     applyTranslations();
     renderSocialLinks();
     renderProjectsFeed();
+    renderSectionImagesPublic();
     if (repopulateAdmin) populateAdminForm();
     return true;
   }
@@ -2036,37 +2303,52 @@ document.addEventListener("DOMContentLoaded", function () {
     const file = event.target.files?.[0];
     if (!file) return;
     const mode = adminGalleryFileInput?.dataset.mode || 'gallery';
+    const resetInput = () => {
+      if (adminGalleryFileInput) { adminGalleryFileInput.value = ''; adminGalleryFileInput.dataset.mode = 'gallery'; }
+    };
 
-    // Режим «проект»: вставляем картинку в выбранный пост
+    // Режим «проект»: вставляем картинку в выбранный пост (со сжатием)
     if (mode === 'project') {
-      const reader = new FileReader();
-      reader.onload = () => {
+      compressImageFile(file, 1280, 0.82).then((dataUrl) => {
         // зафиксируем текущие правки постов, затем подставим картинку
         projectsData = collectAdminProjects();
         const idx = pendingProjectImageIndex;
         if (idx != null && projectsData[idx]) {
-          projectsData[idx].image = reader.result?.toString() || '';
+          projectsData[idx].image = dataUrl;
         }
         pendingProjectImageIndex = null;
-        if (adminGalleryFileInput) { adminGalleryFileInput.value = ''; adminGalleryFileInput.dataset.mode = 'gallery'; }
+        resetInput();
         renderAdminProjectsList();
-      };
-      reader.readAsDataURL(file);
+      }).catch((e) => { console.warn('project image failed', e); resetInput(); });
       return;
     }
 
+    // Режимы «примеры работ» в блоках Заказать/Сотрудничество (до 6, сразу в localStorage)
+    if (mode === 'orderImages' || mode === 'collabImages') {
+      const storageKey = mode;
+      compressImageFile(file, 1600, 0.84).then((dataUrl) => {
+        const arr = loadSectionImages(storageKey);
+        if (arr.length >= 6) { alert('Можно добавить максимум 6 изображений.'); resetInput(); return; }
+        arr.push({ image: dataUrl, alt: file.name });
+        localStorage.setItem(storageKey, JSON.stringify(arr));
+        resetInput();
+        renderAdminSectionImagesAll();
+        renderSectionImagesPublic();
+      }).catch((e) => { console.warn('section image failed', e); resetInput(); });
+      return;
+    }
+
+    // Режим «галерея» (со сжатием)
     const selectedFilters = getAdminSelectedGalleryFilters();
-    const reader = new FileReader();
-    reader.onload = () => {
+    compressImageFile(file, 1280, 0.82).then((dataUrl) => {
       galleryItems.push({
-        image: reader.result?.toString() || '',
+        image: dataUrl,
         alt: file.name,
         tags: selectedFilters.join(' '),
       });
       renderAdminGalleryList();
-      if (adminGalleryFileInput) adminGalleryFileInput.value = '';
-    };
-    reader.readAsDataURL(file);
+      resetInput();
+    }).catch((e) => { console.warn('gallery image failed', e); resetInput(); });
   }
 
   function playTitleEffects() {
@@ -2190,291 +2472,7 @@ document.addEventListener("DOMContentLoaded", function () {
     applyTheme(next);
   }
 
-  /* =====================================================================
-   * ФОРМА ЗАКАЗА — отправка через EmailJS, с резервом в localStorage
-   * EmailJS publicKey ПУБЛИЧНЫЙ по дизайну — это нормально. Защита от спама
-   * (reCAPTCHA, лимиты, allowed origins) настраивается в дашборде EmailJS.
-   * ===================================================================== */
-  const orderForm = document.getElementById("orderForm");
-  const orderTypeSelect = document.getElementById("orderType");
-  const orderStatus = document.getElementById("orderStatus");
-  const orderSubmit = document.getElementById("orderSubmit");
-  const orderContactMethod = document.getElementById("orderContactMethod");
-  const orderContactInput = document.getElementById("orderContact");
-  const orderReplyTo = document.getElementById("orderReplyTo");
-
-  // Форма сотрудничества (та же логика контакта, что и у заказа)
-  const collabForm = document.getElementById("collabForm");
-  const collabStatus = document.getElementById("collabStatus");
-  const collabSubmit = document.getElementById("collabSubmit");
-  const collabContactMethod = document.getElementById("collabContactMethod");
-  const collabContactInput = document.getElementById("collabContact");
-  const collabReplyTo = document.getElementById("collabReplyTo");
-
-  // Подсказки/тип поля контакта зависят от выбранного способа связи.
-  // Для Email включаем встроенную валидацию e-mail; для Discord/Telegram — обычный ник.
-  function updateContactFieldUIFor(methodSel, input) {
-    if (!methodSel || !input) return;
-    const method = methodSel.value;
-    if (method === "email") {
-      input.type = "email";
-      input.placeholder = getText("order_form_contact_ph_email") || "you@example.com";
-      input.autocomplete = "email";
-    } else if (method === "discord") {
-      input.type = "text";
-      input.placeholder = getText("order_form_contact_ph_discord") || "напр. username или username#1234";
-      input.autocomplete = "off";
-    } else if (method === "telegram") {
-      input.type = "text";
-      input.placeholder = getText("order_form_contact_ph_telegram") || "напр. @username";
-      input.autocomplete = "off";
-    }
-  }
-  function updateContactFieldUI() {
-    updateContactFieldUIFor(orderContactMethod, orderContactInput);
-    updateContactFieldUIFor(collabContactMethod, collabContactInput);
-  }
-
-  // reply_to (Reply-To письма) имеет смысл только для e-mail; иначе оставляем пустым.
-  function syncContactFieldFor(methodSel, input, replyTo) {
-    if (!replyTo) return;
-    const method = methodSel ? methodSel.value : "email";
-    replyTo.value = (method === "email" && input) ? input.value.trim() : "";
-  }
-  function syncContactField() {
-    syncContactFieldFor(orderContactMethod, orderContactInput, orderReplyTo);
-    syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
-  }
-
-  function loadEmailjsConfig() {
-    try {
-      const stored = JSON.parse(localStorage.getItem("emailjsConfig") || "{}");
-      return {
-        publicKey: (stored.publicKey || "").trim(),
-        serviceId: (stored.serviceId || "").trim(),
-        templateId: (stored.templateId || "").trim(),
-      };
-    } catch (e) {
-      return { publicKey: "", serviceId: "", templateId: "" };
-    }
-  }
-  function isEmailjsConfigured() {
-    const c = loadEmailjsConfig();
-    return Boolean(window.emailjs && c.publicKey && c.serviceId && c.templateId);
-  }
-
-  function populateOrderTypeSelect() {
-    if (!orderTypeSelect) return;
-    const prev = orderTypeSelect.value;
-    orderTypeSelect.innerHTML = "";
-    const anyOpt = document.createElement("option");
-    anyOpt.value = "";
-    anyOpt.textContent = getText("order_form_type_any") || "Любой / уточним";
-    orderTypeSelect.appendChild(anyOpt);
-    loadFilterSettings()
-      .filter((f) => f.key !== "all")
-      .forEach((f) => {
-        const opt = document.createElement("option");
-        opt.value = f.key;
-        opt.textContent = getText(`filter_${f.key}`) || f.label;
-        orderTypeSelect.appendChild(opt);
-      });
-    if (prev) orderTypeSelect.value = prev;
-  }
-
-  function setOrderStatus(messageKey, kind) {
-    if (!orderStatus) return;
-    orderStatus.textContent = messageKey ? (getText(messageKey) || messageKey) : "";
-    orderStatus.className = "order-status" + (kind ? " is-" + kind : "");
-  }
-
-  function saveOrderLocally(data) {
-    try {
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      orders.unshift(data);
-      localStorage.setItem("orders", JSON.stringify(orders.slice(0, 100)));
-      return true;
-    } catch (e) {
-      console.warn("save order failed", e);
-      return false; // например QuotaExceededError
-    }
-  }
-
-  // Push-уведомление о новой заявке через ntfy.sh (если задан канал).
-  // Токенов не требует — отправляем простой POST на публичный канал.
-  // Заголовок/текст с кириллицей кладём в тело (UTF-8); в заголовок только ASCII.
-  function sendNtfyNotification(data) {
-    let topic = '';
-    try { topic = (localStorage.getItem('ntfyTopic') || '').trim(); } catch (e) {}
-    if (!topic) return;
-    const body = [
-      '🔔 Новая заявка: ' + (data.work_type || ''),
-      'Имя: ' + (data.from_name || '—'),
-      'Контакт: ' + ((data.contact_method || '') + ' ' + (data.contact || '—')).trim(),
-      data.budget && data.budget !== '—' ? 'Бюджет: ' + data.budget : '',
-      data.deadline && data.deadline !== '—' ? 'Срок: ' + data.deadline : '',
-      '',
-      (data.message || ''),
-    ].filter((l) => l !== '').join('\n');
-    try {
-      fetch('https://ntfy.sh/' + encodeURIComponent(topic), {
-        method: 'POST',
-        headers: { 'Title': 'Podvalnia: new request', 'Tags': 'art,incoming_envelope', 'Priority': 'high' },
-        body: body,
-      }).catch((e) => console.warn('ntfy send failed', e));
-    } catch (e) { console.warn('ntfy error', e); }
-  }
-
-  function handleOrderSubmit(event) {
-    event.preventDefault();
-    if (!orderForm) return;
-    // honeypot: если бот заполнил скрытое поле — тихо игнорируем
-    const hp = orderForm.querySelector('input[name="_gotcha"]');
-    if (hp && hp.value) return;
-    // Перед проверкой формы синхронизируем скрытый reply_to (нужен EmailJS только для Email)
-    syncContactField();
-    if (!orderForm.checkValidity()) {
-      orderForm.reportValidity();
-      return;
-    }
-
-    const method = orderContactMethod ? orderContactMethod.value : "email";
-    const methodLabel = orderContactMethod
-      ? (orderContactMethod.options[orderContactMethod.selectedIndex]?.textContent || method)
-      : "Email";
-    const contactValue = orderContactInput ? orderContactInput.value.trim() : "";
-
-    const data = {
-      from_name: orderForm.querySelector('[name="from_name"]').value.trim(),
-      contact_method: methodLabel,
-      contact: contactValue,
-      // reply_to нужен письму как Reply-To: ставим email только если способ — Email
-      reply_to: method === "email" ? contactValue : "",
-      // Читаемый ярлык типа работы для письма (например «Скетчи»), а не машинный ключ
-      work_type: orderTypeSelect && orderTypeSelect.value
-        ? (orderTypeSelect.options[orderTypeSelect.selectedIndex]?.textContent || "")
-        : (getText("order_form_type_any") || ""),
-      budget: orderForm.querySelector('[name="budget"]').value.trim() || "—",
-      deadline: orderForm.querySelector('[name="deadline"]').value || "—",
-      message: orderForm.querySelector('[name="message"]').value.trim(),
-      at: new Date().toISOString(),
-    };
-
-    // Push-уведомление (ntfy) — независимо от EmailJS
-    sendNtfyNotification(data);
-
-    if (orderSubmit) {
-      orderSubmit.disabled = true;
-      orderForm.setAttribute("aria-busy", "true");
-    }
-    setOrderStatus("order_form_sending", "info");
-
-    const finish = (key, kind, reset) => {
-      setOrderStatus(key, kind);
-      if (orderSubmit) {
-        orderSubmit.disabled = false;
-        orderForm.removeAttribute("aria-busy");
-      }
-      if (reset) {
-        orderForm.reset();
-      }
-    };
-
-    if (isEmailjsConfigured()) {
-      const cfg = loadEmailjsConfig();
-      window.emailjs
-        .sendForm(cfg.serviceId, cfg.templateId, orderForm, { publicKey: cfg.publicKey })
-        .then(() => finish("order_form_success", "success", true))
-        .catch((err) => {
-          console.warn("EmailJS send failed", err);
-          saveOrderLocally(data);
-          finish("order_form_error", "error", false);
-        });
-    } else {
-      // EmailJS не настроен — сохраняем локально и честно сообщаем
-      saveOrderLocally(data);
-      finish("order_form_saved", "info", true);
-    }
-  }
-
-  // Универсальный статус для любой формы
-  function setFormStatus(el, messageKey, kind) {
-    if (!el) return;
-    el.textContent = messageKey ? (getText(messageKey) || messageKey) : "";
-    el.className = "order-status" + (kind ? " is-" + kind : "");
-  }
-
-  // Заявка на сотрудничество — та же EmailJS, помечается work_type = «Сотрудничество».
-  function handleCollabSubmit(event) {
-    event.preventDefault();
-    if (!collabForm) return;
-    const hp = collabForm.querySelector('input[name="_gotcha"]');
-    if (hp && hp.value) return;
-    syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
-    if (!collabForm.checkValidity()) {
-      collabForm.reportValidity();
-      return;
-    }
-
-    const method = collabContactMethod ? collabContactMethod.value : "email";
-    const methodLabel = collabContactMethod
-      ? (collabContactMethod.options[collabContactMethod.selectedIndex]?.textContent || method)
-      : "Email";
-    const contactValue = collabContactInput ? collabContactInput.value.trim() : "";
-
-    const data = {
-      from_name: collabForm.querySelector('[name="from_name"]').value.trim(),
-      contact_method: methodLabel,
-      contact: contactValue,
-      reply_to: method === "email" ? contactValue : "",
-      work_type: getText("collab_form_kind") || "Сотрудничество",
-      budget: "—",
-      deadline: "—",
-      message: collabForm.querySelector('[name="message"]').value.trim(),
-      at: new Date().toISOString(),
-    };
-
-    sendNtfyNotification(data);
-
-    if (collabSubmit) {
-      collabSubmit.disabled = true;
-      collabForm.setAttribute("aria-busy", "true");
-    }
-    setFormStatus(collabStatus, "order_form_sending", "info");
-
-    const finish = (key, kind, reset) => {
-      setFormStatus(collabStatus, key, kind);
-      if (collabSubmit) {
-        collabSubmit.disabled = false;
-        collabForm.removeAttribute("aria-busy");
-      }
-      if (reset) collabForm.reset();
-    };
-
-    if (isEmailjsConfigured()) {
-      const cfg = loadEmailjsConfig();
-      window.emailjs
-        .sendForm(cfg.serviceId, cfg.templateId, collabForm, { publicKey: cfg.publicKey })
-        .then(() => finish("order_form_success", "success", true))
-        .catch((err) => {
-          console.warn("EmailJS send failed", err);
-          saveOrderLocally(data);
-          finish("order_form_error", "error", false);
-        });
-    } else {
-      saveOrderLocally(data);
-      finish("order_form_saved", "info", true);
-    }
-  }
-
-  /* =====================================================================
-   * АДМИНКА: настройки EmailJS + просмотр локальных заявок
-   * ===================================================================== */
-  const adminEmailjsPublicKey = document.getElementById("adminEmailjsPublicKey");
-  const adminEmailjsServiceId = document.getElementById("adminEmailjsServiceId");
-  const adminEmailjsTemplateId = document.getElementById("adminEmailjsTemplateId");
-  const adminOrdersList = document.getElementById("adminOrdersList");
-  const adminClearOrders = document.getElementById("adminClearOrders");
+  // Водяной знак (защита контента) — настройки в админке
   const adminWatermarkEnabled = document.getElementById("adminWatermarkEnabled");
   const adminWatermarkText = document.getElementById("adminWatermarkText");
 
@@ -2489,67 +2487,6 @@ document.addEventListener("DOMContentLoaded", function () {
       text: adminWatermarkText ? adminWatermarkText.value.trim() : "",
     };
     localStorage.setItem("watermark", JSON.stringify(wm));
-  }
-
-  const adminNtfyTopic = document.getElementById("adminNtfyTopic");
-  function populateEmailjsFields() {
-    const cfg = loadEmailjsConfig();
-    if (adminEmailjsPublicKey) adminEmailjsPublicKey.value = cfg.publicKey;
-    if (adminEmailjsServiceId) adminEmailjsServiceId.value = cfg.serviceId;
-    if (adminEmailjsTemplateId) adminEmailjsTemplateId.value = cfg.templateId;
-    if (adminNtfyTopic) adminNtfyTopic.value = localStorage.getItem('ntfyTopic') || '';
-  }
-  function saveEmailjsConfig() {
-    const cfg = {
-      publicKey: adminEmailjsPublicKey ? adminEmailjsPublicKey.value.trim() : "",
-      serviceId: adminEmailjsServiceId ? adminEmailjsServiceId.value.trim() : "",
-      templateId: adminEmailjsTemplateId ? adminEmailjsTemplateId.value.trim() : "",
-    };
-    localStorage.setItem("emailjsConfig", JSON.stringify(cfg));
-    if (adminNtfyTopic) localStorage.setItem('ntfyTopic', adminNtfyTopic.value.trim());
-  }
-  function renderAdminOrders() {
-    if (!adminOrdersList) return;
-    let orders = [];
-    try { orders = JSON.parse(localStorage.getItem("orders") || "[]"); } catch (e) {}
-    adminOrdersList.innerHTML = "";
-    if (!orders.length) {
-      const empty = document.createElement("div");
-      empty.className = "admin-orders-empty";
-      empty.textContent = "Заявок пока нет.";
-      adminOrdersList.appendChild(empty);
-      return;
-    }
-    orders.forEach((o) => {
-      const row = document.createElement("div");
-      row.className = "admin-order";
-      const head = document.createElement("div");
-      head.className = "admin-order__head";
-      const who = document.createElement("span");
-      who.textContent = o.from_name || "—"; // textContent — без XSS
-      const when = document.createElement("span");
-      when.className = "admin-order__meta";
-      when.textContent = o.at ? new Date(o.at).toLocaleString() : "";
-      head.appendChild(who);
-      head.appendChild(when);
-
-      const meta = document.createElement("div");
-      meta.className = "admin-order__meta";
-      // Контакт: «Способ: значение» (для старых заявок — поле reply_to)
-      const contactStr = o.contact
-        ? ((o.contact_method ? o.contact_method + ": " : "") + o.contact)
-        : (o.reply_to || null);
-      meta.textContent = [contactStr, o.work_type, o.budget && o.budget !== "—" ? o.budget : null, o.deadline && o.deadline !== "—" ? o.deadline : null]
-        .filter(Boolean).join(" · ");
-
-      const msg = document.createElement("div");
-      msg.textContent = o.message || "";
-
-      row.appendChild(head);
-      row.appendChild(meta);
-      row.appendChild(msg);
-      adminOrdersList.appendChild(row);
-    });
   }
 
   // Event listeners
@@ -2618,42 +2555,24 @@ document.addEventListener("DOMContentLoaded", function () {
     filterClearBtn.addEventListener("click", clearAllFilters);
   }
 
-  // Форма заказа
-  if (orderForm) {
-    orderForm.addEventListener("submit", handleOrderSubmit);
+  // Кнопки «Скопировать шаблон» (заказ / сотрудничество)
+  const orderCopyBtn = document.getElementById('orderCopyBtn');
+  const orderCopyStatus = document.getElementById('orderCopyStatus');
+  if (orderCopyBtn) {
+    orderCopyBtn.addEventListener('click', () => copyTemplate('order_template', orderCopyStatus));
   }
-  // Способ связи: меняем тип/подсказку поля контакта и синхронизируем reply_to
-  if (orderContactMethod) {
-    orderContactMethod.addEventListener("change", () => {
-      updateContactFieldUI();
-      syncContactField();
-    });
-  }
-  if (orderContactInput) {
-    orderContactInput.addEventListener("input", syncContactField);
+  const collabCopyBtn = document.getElementById('collabCopyBtn');
+  const collabCopyStatus = document.getElementById('collabCopyStatus');
+  if (collabCopyBtn) {
+    collabCopyBtn.addEventListener('click', () => copyTemplate('collab_template', collabCopyStatus));
   }
 
-  // Форма сотрудничества
-  if (collabForm) {
-    collabForm.addEventListener("submit", handleCollabSubmit);
+  // Админка: «Добавить изображение» в блоки Заказать/Сотрудничество (до 6)
+  if (adminAddOrderImage) {
+    adminAddOrderImage.addEventListener('click', () => openSectionImagePicker('orderImages'));
   }
-  if (collabContactMethod) {
-    collabContactMethod.addEventListener("change", () => {
-      updateContactFieldUIFor(collabContactMethod, collabContactInput);
-      syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo);
-    });
-  }
-  if (collabContactInput) {
-    collabContactInput.addEventListener("input", () => syncContactFieldFor(collabContactMethod, collabContactInput, collabReplyTo));
-  }
-  updateContactFieldUI();
-
-  // Админка: заявки
-  if (adminClearOrders) {
-    adminClearOrders.addEventListener("click", () => {
-      localStorage.removeItem("orders");
-      renderAdminOrders();
-    });
+  if (adminAddCollabImage) {
+    adminAddCollabImage.addEventListener('click', () => openSectionImagePicker('collabImages'));
   }
 
   if (adminHeaderImageBtn) {
@@ -2817,10 +2736,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (adminReset) {
     adminReset.addEventListener("click", () => {
-      if (!confirm('Сбросить ВЕСЬ контент к стандартному (галерея, фильтры, тексты, проекты, соцсети, картинки шапки и полос, водяной знак)? Это нельзя отменить.\n\nНастройки (пароль, EmailJS, ntfy, токен публикации) НЕ трогаются.')) return;
+      if (!confirm('Сбросить ВЕСЬ контент к стандартному (галерея, фильтры, тексты, проекты, соцсети, картинки шапки и полос, примеры работ, водяной знак)? Это нельзя отменить.\n\nНастройки (пароль, токен публикации) НЕ трогаются.')) return;
       // Чистим именно контентные ключи (без паролей/ключей-настроек).
       ['galleryItems','galleryFilters','customTexts','projects','socialLinks',
-       'adminHeaderImage','adminLeftSidebar','adminRightSidebar','watermark'].forEach((k) => localStorage.removeItem(k));
+       'adminHeaderImage','adminLeftSidebar','adminRightSidebar','watermark',
+       'orderImages','collabImages','contactLinks'].forEach((k) => localStorage.removeItem(k));
       // Возвращаем картинки по умолчанию (как в исходном index.html)
       if (heroBgImage) heroBgImage.src = 'IMG_1858.PNG';
       if (leftSidebarImage) leftSidebarImage.src = 'Полосы.JPG';
@@ -2853,7 +2773,7 @@ document.addEventListener("DOMContentLoaded", function () {
   resetGalleryRotation();
   applyTranslations();
   applyAdminImages();
-  populateOrderTypeSelect();
+  renderSectionImagesPublic();
   renderProjectsFeed();
   updateLangSwitcher();
 
