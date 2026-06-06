@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const heroWrap = document.querySelector(".hero-title-wrap");
   const bird = document.querySelector(".bird");
   const adminSocialLinks = document.getElementById("adminSocialLinks");
+  const adminAddSocial = document.getElementById("adminAddSocial");
   const adminTextLang = document.getElementById("adminTextLang");
   const adminProjectsList = document.getElementById("adminProjectsList");
   const adminAddProject = document.getElementById("adminAddProject");
@@ -1004,6 +1005,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderAdminGalleryFilterSelectors();
     renderAdminGalleryList();
     renderAdminTextList();
+    renderAdminSocialList();
     renderAdminProjectsList();
     populateEmailjsFields();
     populateWatermarkFields();
@@ -1171,21 +1173,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
       adminTextList.appendChild(sectionWrap);
     });
-
-    renderAdminSocialList();
+    // Соцсети рендерятся отдельно (в populateAdminForm), чтобы смена языка
+    // редактирования не стирала несохранённые правки в списке соцсетей.
   }
 
   // Social links management
+  const MAX_SOCIAL_LINKS = 10;
+
+  // Соцсети хранятся МАССИВОМ [{label, url, i18nKey?}] (до 10 штук). У трёх стандартных
+  // кнопок есть i18nKey для перевода; у добавленных пользователем — только label.
+  function defaultSocialLinks() {
+    return [
+      { label: 'Instagram', url: '#', i18nKey: 'social_instagram' },
+      { label: 'Telegram', url: '#', i18nKey: 'social_telegram' },
+      { label: 'VK', url: '#', i18nKey: 'social_vk' },
+    ];
+  }
+
+  // Приводим к массиву: поддерживаем и НОВЫЙ формат (массив), и СТАРЫЙ
+  // ({ social_x: {label,url} }) — чтобы уже сохранённые/опубликованные данные не потерялись.
+  function normalizeSocialLinks(parsed) {
+    let arr = [];
+    if (Array.isArray(parsed)) {
+      arr = parsed.map((it) => ({
+        label: (it && it.label != null ? String(it.label) : '').trim(),
+        url: it && it.url ? it.url : '#',
+        i18nKey: it && it.i18nKey ? it.i18nKey : undefined,
+      }));
+    } else if (parsed && typeof parsed === 'object') {
+      arr = Object.keys(parsed).map((k) => ({
+        label: (parsed[k] && parsed[k].label) || k.replace('social_', ''),
+        url: (parsed[k] && parsed[k].url) || '#',
+        i18nKey: k,
+      }));
+    }
+    arr = arr.filter((it) => it && (it.label || (it.url && it.url !== '#')));
+    return arr.slice(0, MAX_SOCIAL_LINKS);
+  }
+
   function loadSocialLinks() {
     try {
       const stored = localStorage.getItem('socialLinks');
-      if (stored) return JSON.parse(stored);
+      if (stored) return normalizeSocialLinks(JSON.parse(stored));
     } catch (e) { console.warn('socialLinks parse error', e); }
-    return {
-      social_instagram: { label: 'Instagram', url: '#'},
-      social_telegram: { label: 'Telegram', url: '#'},
-      social_vk: { label: 'VK', url: '#'}
-    };
+    return defaultSocialLinks();
   }
 
   function normalizeUrl(url) {
@@ -1203,20 +1234,22 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!container) return;
     const links = loadSocialLinks();
     container.innerHTML = '';
-    Object.keys(links).forEach((key) => {
+    links.forEach((item) => {
       const anchor = document.createElement('a');
       anchor.className = 'social-button';
-      const href = normalizeUrl(links[key].url || '#');
+      const href = normalizeUrl(item.url || '#');
       anchor.href = href;
       if (href.startsWith('http')) {
         anchor.target = '_blank';
         anchor.rel = 'noopener noreferrer';
       }
-      const translationExists = Boolean(translations[currentLanguage] && translations[currentLanguage][key]);
-      const label = links[key].label || getText(key) || key.replace('social_', '');
+      const i18nKey = item.i18nKey;
+      const translated = i18nKey ? getText(i18nKey) : '';
+      const label = item.label || translated || 'link';
       anchor.textContent = label;
-      if (translationExists) {
-        anchor.dataset.i18n = key;
+      // Перевод привязываем только к стандартным кнопкам, которые пользователь не переименовал.
+      if (i18nKey && translated && (!item.label || item.label === translated)) {
+        anchor.dataset.i18n = i18nKey;
       } else {
         anchor.removeAttribute('data-i18n');
         anchor.dataset.manualLabel = 'true';
@@ -1225,54 +1258,67 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Строка редактора соцсети: название + ссылка + «Удалить». Ключ перевода (если есть)
+  // храним в data-атрибуте, пользователю он не показывается.
+  function buildAdminSocialRow(item) {
+    const row = document.createElement('div');
+    row.className = 'admin-social-row';
+    if (item && item.i18nKey) row.dataset.i18nKey = item.i18nKey;
+
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.placeholder = 'Название (напр. Instagram)';
+    labelInput.className = 'admin-social-label';
+    labelInput.value = (item && item.label) || (item && item.i18nKey ? getText(item.i18nKey) : '') || '';
+
+    const urlInput = document.createElement('input');
+    urlInput.type = 'text';
+    urlInput.placeholder = 'Ссылка (https://…)';
+    urlInput.className = 'admin-social-url';
+    urlInput.value = item && item.url && item.url !== '#' ? item.url : '';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'admin-button admin-button--secondary admin-social-remove';
+    removeBtn.textContent = 'Удалить';
+    removeBtn.addEventListener('click', () => { row.remove(); updateAddSocialButton(); });
+
+    row.appendChild(labelInput);
+    row.appendChild(urlInput);
+    row.appendChild(removeBtn);
+    return row;
+  }
+
+  function updateAddSocialButton() {
+    if (!adminAddSocial || !adminSocialLinks) return;
+    const count = adminSocialLinks.querySelectorAll('.admin-social-row').length;
+    adminAddSocial.disabled = count >= MAX_SOCIAL_LINKS;
+    adminAddSocial.textContent = count >= MAX_SOCIAL_LINKS
+      ? `Максимум ${MAX_SOCIAL_LINKS} соцсетей`
+      : 'Добавить соцсеть';
+  }
+
   function renderAdminSocialList() {
     if (!adminSocialLinks) return;
     adminSocialLinks.innerHTML = '';
-    const links = loadSocialLinks();
-    Object.keys(links).forEach((key) => {
-      const row = document.createElement('div');
-      row.className = 'admin-social-row';
-
-      const keyInput = document.createElement('input');
-      keyInput.type = 'text';
-      keyInput.value = key.replace('social_', '');
-      keyInput.disabled = true;
-      keyInput.className = 'admin-social-key';
-      keyInput.dataset.socialKey = key;
-
-      const labelInput = document.createElement('input');
-      labelInput.type = 'text';
-      labelInput.placeholder = 'Название кнопки';
-      labelInput.value = links[key].label || getText(key) || '';
-
-      const urlInput = document.createElement('input');
-      urlInput.type = 'text';
-      urlInput.placeholder = 'Ссылка (https://…)';
-      urlInput.value = links[key].url && links[key].url !== '#' ? links[key].url : '';
-
-      row.appendChild(keyInput);
-      row.appendChild(labelInput);
-      row.appendChild(urlInput);
-      adminSocialLinks.appendChild(row);
+    loadSocialLinks().forEach((item) => {
+      adminSocialLinks.appendChild(buildAdminSocialRow(item));
     });
+    updateAddSocialButton();
   }
 
   function collectAdminSocialLinks() {
     const rows = document.querySelectorAll('#adminSocialLinks .admin-social-row');
-    const out = {};
+    const out = [];
     rows.forEach((row) => {
-      const inputs = row.querySelectorAll('input');
-      if (inputs.length >= 3) {
-        // Реальный ключ берём из data-атрибута (в поле показываем без префикса social_)
-        const key = inputs[0].dataset.socialKey || ('social_' + inputs[0].value.trim());
-        const label = inputs[1].value.trim();
-        const url = inputs[2].value.trim() ? normalizeUrl(inputs[2].value.trim()) : '#';
-        if (key) {
-          out[key] = { label: label || key.replace('social_', ''), url };
-        }
-      }
+      const label = (row.querySelector('.admin-social-label')?.value || '').trim();
+      const urlRaw = (row.querySelector('.admin-social-url')?.value || '').trim();
+      if (!label && !urlRaw) return; // пустую строку пропускаем
+      const item = { label: label || 'link', url: urlRaw ? normalizeUrl(urlRaw) : '#' };
+      if (row.dataset.i18nKey) item.i18nKey = row.dataset.i18nKey;
+      out.push(item);
     });
-    return out;
+    return out.slice(0, MAX_SOCIAL_LINKS);
   }
 
   /* =====================================================================
@@ -2692,6 +2738,20 @@ document.addEventListener("DOMContentLoaded", function () {
       projectsData = collectAdminProjects();
       projectsData.push({ image: '', date: '', caption: {} });
       renderAdminProjectsList();
+    });
+  }
+
+  // Добавить ячейку соцсети (до 10): новая строка добавляется прямо в редактор,
+  // сохраняется при «Применить»/«Сохранить».
+  if (adminAddSocial) {
+    adminAddSocial.addEventListener('click', () => {
+      if (!adminSocialLinks) return;
+      const count = adminSocialLinks.querySelectorAll('.admin-social-row').length;
+      if (count >= MAX_SOCIAL_LINKS) return;
+      const row = buildAdminSocialRow({ label: '', url: '' });
+      adminSocialLinks.appendChild(row);
+      row.querySelector('.admin-social-label')?.focus();
+      updateAddSocialButton();
     });
   }
 

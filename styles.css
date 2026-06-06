@@ -67,45 +67,47 @@
      #0F0600 · #1F1305 · #2B1E0B · #562A0D · #84491D */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1f1305;
-  --surface: #562a0d;
-  --surface-strong: #84491d;
-  --accent: #e8c79a;
-  --accent-soft: #2b1e0b;
-  --text: #f2e3c8;
+  /* Глубокая тёплая «эспрессо»-палитра: темнее прежней, но БЕЗ чистого чёрного —
+     самые тёмные тона остаются тёплыми тёмно-коричневыми. */
+  --bg: #1a1004;
+  --surface: #4c2710;
+  --surface-strong: #7a401a;
+  --accent: #edd2a8;
+  --accent-soft: #271a09;
+  --text: #f4e6cd;
   --text-soft: #cdb38c;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
 
-  --card-bg: rgba(43, 30, 11, 0.72);
-  --card-border: rgba(216, 179, 130, 0.16);
+  --card-bg: rgba(38, 25, 11, 0.8);
+  --card-border: rgba(216, 179, 130, 0.18);
   --glass-blur: 18px;
-  /* Сверху коричневый (#2B1E0B) → к низу почти чёрный (#0F0600). */
+  /* Сверху насыщенный коричневый → к низу очень тёмный ТЁПЛЫЙ коричневый (не чёрный). */
   --page-bg: linear-gradient(180deg,
-    #2b1e0b 0%,
-    #1f1305 45%,
-    #150c02 78%,
-    #0f0600 100%);
+    #281809 0%,
+    #1e1307 40%,
+    #190f05 72%,
+    #160d05 100%);
   --filter-bg: #b06a2c;
   --filter-bg-hover: #c47e3a;
-  --field-bg: rgba(31, 19, 5, 0.92);
+  --field-bg: rgba(26, 16, 5, 0.92);
   --field-border: rgba(216, 179, 130, 0.22);
   --ring: rgba(132, 73, 29, 0.7);
-  /* Кнопки навигации/неактивных фильтров — тёплый коричнево-оранжевый из файла */
-  --nav-bg: #562a0d;
-  --nav-bg-hover: #84491d;
+  /* Кнопки навигации/неактивных фильтров — тёплый коричневый */
+  --nav-bg: #4c2710;
+  --nav-bg-hover: #7a401a;
 }
 
 /* Тёмная тема: шапка темнеет СНИЗУ к ТЁПЛОМУ коричневому (а не к холодному чёрному),
    чтобы вуаль не «загрязняла» картинку. Низ плавно переходит в тёплый верх страницы (#2b1e0b). */
 [data-theme="dark"] .hero-section {
-  background: linear-gradient(180deg, #3a2810 0%, #241706 100%);
+  background: linear-gradient(180deg, #33230e 0%, #1f1406 100%);
 }
 [data-theme="dark"] .hero-section::after {
   background: linear-gradient(180deg,
-    rgba(86, 42, 13, 0.10) 0%,
-    rgba(86, 42, 13, 0.30) 45%,
-    rgba(60, 36, 14, 0.56) 78%,
-    rgba(43, 30, 11, 0.82) 100%);
+    rgba(74, 39, 16, 0.12) 0%,
+    rgba(74, 39, 16, 0.32) 45%,
+    rgba(45, 28, 12, 0.60) 78%,
+    rgba(31, 20, 8, 0.86) 100%);
 }
 
 * {
@@ -465,7 +467,9 @@ html {
 }
 
 .hero-title {
-  font-size: min(9cqi, 3.6rem);
+  /* Коэффициент cqi подобран так, чтобы ник из 18 символов ВСЕГДА влезал в одну
+     строку с запасом даже на узких телефонах (раньше 9cqi обрезал на <380px). */
+  font-size: min(8cqi, 3.6rem);
   line-height: 1.04;
   margin: 0;
   font-weight: 800;
@@ -491,12 +495,15 @@ html {
      контейнера (cqi), поэтому подпись всегда в ОДНУ строку и не обрезается. */
   font-family: var(--font-display);
   letter-spacing: var(--ls-display);
-  font-size: min(6cqi, 2rem);
+  font-size: min(5.2cqi, 2rem);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--text);
   text-shadow: 0 2px 8px rgba(81, 50, 21, 0.18);
-  white-space: nowrap;
+  /* normal (а не nowrap): на очень узких экранах/длинных переводах подпись
+     переносится на 2 строки, а не обрезается. */
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 [data-theme="dark"] .hero-subtitle {
   color: var(--text);
@@ -1132,15 +1139,15 @@ main {
 /* Светлая тема: фильтры СВЕТЛЫЕ, пока не выбраны, и ТЕМНЕЮТ при нажатии (инверсия
    относительно тёмной темы, где активный — светлый). */
 [data-theme="light"] .filter-button {
-  background: var(--field-bg);
+  background: #fbe3ad;
   color: #6a3f12;
-  border-color: rgba(161, 56, 8, 0.30);
+  border-color: rgba(161, 56, 8, 0.28);
   box-shadow: 0 8px 18px rgba(122, 68, 10, 0.12);
 }
 [data-theme="light"] .filter-button:hover,
 [data-theme="light"] .filter-button:focus-visible {
-  background: #fffdf7;
-  border-color: rgba(161, 56, 8, 0.5);
+  background: #ffeec4;
+  border-color: rgba(161, 56, 8, 0.45);
 }
 [data-theme="light"] .filter-button.active {
   background: var(--nav-bg);
@@ -1667,18 +1674,22 @@ main {
     line-height: 1.1;
   }
 
-  /* Навигация в одну колонку, кнопки на всю ширину, без огромного min-width */
+  /* Навигация — компактные «пилюли» в несколько рядов по центру (НЕ во всю ширину,
+     чтобы кнопки не были такими большими). */
   .hero-nav {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: stretch;
-    gap: 10px;
-    margin-bottom: 22px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
   .nav-button {
     min-width: 0;
-    width: 100%;
-    padding: 13px 16px;
-    font-size: 0.98rem;
+    width: auto;
+    flex: 0 1 auto;
+    padding: 10px 14px;
+    font-size: 0.9rem;
   }
 
   /* Утилиты (язык / тема) — переносятся аккуратно */
@@ -1748,6 +1759,40 @@ main {
     max-width: 100%;
     margin-top: 0;
   }
+
+  /* Админка на телефоне — лист во весь экран без «плавающих» полей; шапка
+     с заголовком и крестиком «прилипает» сверху при прокрутке. */
+  .admin-modal {
+    padding: 0;
+  }
+  .admin-modal__panel {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin-top: 0;
+    border-radius: 0;
+    padding: 0 14px 20px;
+  }
+  .admin-modal__header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 -14px 14px;
+    padding: 14px 14px 12px;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--card-border);
+  }
+  .admin-modal__header .admin-note {
+    display: none;
+  }
+  .admin-modal__header h2 {
+    font-size: 1.25rem;
+  }
   .language-modal__prompt {
     font-size: 1.05rem;
     line-height: 1.3;
@@ -1791,6 +1836,19 @@ main {
   .social-button,
   .cta-button {
     min-height: 44px;
+  }
+}
+
+/* Узкие телефоны: соцсети по 2 в ряд (длинные подписи не вылезают за край),
+   навигация ещё компактнее. */
+@media (max-width: 480px) {
+  .social-button {
+    flex: 1 1 calc(50% - 12px);
+    min-width: 0;
+  }
+  .nav-button {
+    font-size: 0.86rem;
+    padding: 9px 12px;
   }
 }
 
@@ -2442,7 +2500,7 @@ main {
 .admin-social-links { display: grid; gap: 8px; }
 .admin-social-row {
   display: grid;
-  grid-template-columns: 90px 1fr 1.4fr;
+  grid-template-columns: 1fr 1.4fr auto;
   gap: 8px;
   align-items: center;
 }
@@ -2456,6 +2514,14 @@ main {
   font: inherit;
 }
 .admin-social-row input:disabled { opacity: 0.7; }
+.admin-social-remove {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.admin-social-add { margin-top: 10px; }
+.admin-social-add:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .admin-io-actions {
   display: flex;
