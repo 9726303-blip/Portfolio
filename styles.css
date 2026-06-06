@@ -21,52 +21,91 @@
   --t-med: 0.32s;
 }
 
-/* ===== Светлая тема (по умолчанию) ===== */
+/* ===== Светлая тема (по умолчанию) =====
+   Палитра взята ТОЧНО из исходного файла палитра.jpg:
+     #513215 тёмно-коричневый · #A13808 кирпич · #E98E0C оранжевый · #F0BB51 янтарь */
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f5c56a;
-  --surface: #f2a30f;
-  --surface-strong: #bf3f0a;
-  --accent: #4f3216;
-  --accent-soft: #f7cf7d;
-  --text: #3b2c1e;
-  --text-soft: #5d4a37;
-  --shadow: 0 24px 80px rgba(88, 46, 17, 0.22);
+  --c-brown: #513215;
+  --c-brick: #a13808;
+  --c-orange: #e98e0c;
+  --c-amber: #f0bb51;
+
+  --bg: var(--c-amber);
+  --surface: var(--c-orange);
+  --surface-strong: var(--c-brick);
+  --accent: var(--c-brown);
+  --accent-soft: #f4cd7e;
+  --text: #3b2613;
+  --text-soft: #6b4e30;
+  --shadow: 0 24px 80px rgba(81, 50, 21, 0.24);
 
   /* Поверхности под 2026: стекло */
-  --card-bg: rgba(255, 243, 218, 0.78);
-  --card-border: rgba(255, 255, 255, 0.45);
+  --card-bg: rgba(255, 244, 222, 0.82);
+  --card-border: rgba(255, 255, 255, 0.5);
   --glass-blur: 16px;
-  /* Палитра как в задумке: СВЕРХУ жёлтый → К НИЗУ оранжевый (без тёмно-красного).
-     Градиент тянется по всей высоте страницы. */
-  --page-bg: linear-gradient(180deg, #f7cf73 0%, #f3b637 38%, #ef9d2a 70%, #e9821f 100%);
-  --field-bg: #fffaf3;
-  --field-border: rgba(112, 76, 34, 0.18);
-  --ring: rgba(214, 120, 38, 0.55);
+  /* Та же гамма, но мягче (меньше насыщенность, теплее) — не режет глаза. */
+  --page-bg: linear-gradient(180deg,
+    #f7d6a6 0%,
+    #ecbc63 18%,
+    #e3a648 48%,
+    #d6862f 76%,
+    #bb5e21 100%);
+  /* Жёлтые пилюли-фильтров (активный фильтр) — светлые и жёлтые */
+  --filter-bg: #fbe7a8;
+  --filter-bg-hover: #fff0bd;
+  --field-bg: #fff7ea;
+  --field-border: rgba(112, 76, 34, 0.2);
+  --ring: rgba(233, 142, 12, 0.55);
+  /* Цвет кнопок навигации (его же получают неактивные фильтры) */
+  --nav-bg: rgba(161, 56, 8, 0.96);
+  --nav-bg-hover: rgba(187, 70, 16, 1);
 }
 
-/* ===== Тёмная тема ===== */
+/* ===== Тёмная тема ===== ТОЧНО по файлу "темная тема.jpg":
+     #0F0600 · #1F1305 · #2B1E0B · #562A0D · #84491D */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1a120b;
-  --surface: #c97a1e;
-  --surface-strong: #e8893a;
-  --accent: #f4d8a8;
-  --accent-soft: #6b4519;
-  --text: #f6e7cf;
-  --text-soft: #d8c2a0;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --bg: #1f1305;
+  --surface: #562a0d;
+  --surface-strong: #84491d;
+  --accent: #e8c79a;
+  --accent-soft: #2b1e0b;
+  --text: #f2e3c8;
+  --text-soft: #cdb38c;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
 
-  --card-bg: rgba(46, 32, 19, 0.66);
-  --card-border: rgba(244, 216, 168, 0.14);
+  --card-bg: rgba(43, 30, 11, 0.72);
+  --card-border: rgba(216, 179, 130, 0.16);
   --glass-blur: 18px;
-  --page-bg: radial-gradient(circle at top left, rgba(201, 122, 30, 0.22), transparent 32%),
-             radial-gradient(circle at bottom right, rgba(120, 60, 20, 0.3), transparent 30%),
-             linear-gradient(180deg, #241710 0%, #1a120b 45%, #120c07 100%);
-  --field-bg: rgba(28, 19, 11, 0.85);
-  --field-border: rgba(244, 216, 168, 0.18);
-  --ring: rgba(244, 184, 110, 0.6);
+  /* Сверху коричневый (#2B1E0B) → к низу почти чёрный (#0F0600). */
+  --page-bg: linear-gradient(180deg,
+    #2b1e0b 0%,
+    #1f1305 45%,
+    #150c02 78%,
+    #0f0600 100%);
+  --filter-bg: #b06a2c;
+  --filter-bg-hover: #c47e3a;
+  --field-bg: rgba(31, 19, 5, 0.92);
+  --field-border: rgba(216, 179, 130, 0.22);
+  --ring: rgba(132, 73, 29, 0.7);
+  /* Кнопки навигации/неактивных фильтров — тёплый коричнево-оранжевый из файла */
+  --nav-bg: #562a0d;
+  --nav-bg-hover: #84491d;
+}
+
+/* Тёмная тема: шапка темнеет СНИЗУ к ТЁПЛОМУ коричневому (а не к холодному чёрному),
+   чтобы вуаль не «загрязняла» картинку. Низ плавно переходит в тёплый верх страницы (#2b1e0b). */
+[data-theme="dark"] .hero-section {
+  background: linear-gradient(180deg, #3a2810 0%, #241706 100%);
+}
+[data-theme="dark"] .hero-section::after {
+  background: linear-gradient(180deg,
+    rgba(86, 42, 13, 0.10) 0%,
+    rgba(86, 42, 13, 0.30) 45%,
+    rgba(60, 36, 14, 0.56) 78%,
+    rgba(43, 30, 11, 0.82) 100%);
 }
 
 * {
@@ -127,14 +166,8 @@ body {
    цветами (кнопки, модалки, вся админка, статусы). Специфичность
    [data-theme="dark"] .x выше, чем у .x, поэтому светлая тема не страдает.
    ===================================================================== */
-[data-theme="dark"] .nav-button {
-  background: rgba(201, 122, 30, 0.92);
-  color: #fff3df;
-}
-[data-theme="dark"] .nav-button:hover,
-[data-theme="dark"] .nav-button:focus-visible {
-  background: rgba(232, 137, 58, 0.96);
-}
+/* nav-button в тёмной теме берёт цвет из --nav-bg (см. [data-theme="dark"]) */
+[data-theme="dark"] .nav-button { color: #f4d8a8; }
 [data-theme="dark"] .language-button,
 [data-theme="dark"] .admin-button {
   background: rgba(201, 122, 30, 0.9);
@@ -185,6 +218,8 @@ body {
 }
 [data-theme="dark"] .admin-filter-group__title,
 [data-theme="dark"] .admin-filter-label,
+[data-theme="dark"] .admin-filter-chip__title,
+[data-theme="dark"] .admin-filter-lang-name,
 [data-theme="dark"] .admin-field label,
 [data-theme="dark"] .admin-text-section__title,
 [data-theme="dark"] .admin-modal__header h2,
@@ -229,22 +264,21 @@ body {
 [data-theme="dark"] .admin-close { color: #fff3df; }
 [data-theme="dark"] .ghost-button,
 [data-theme="dark"] .theme-toggle {
-  border-color: rgba(244, 216, 168, 0.4);
-  background: rgba(244, 216, 168, 0.12);
+  border-color: rgba(244, 216, 168, 0.62);
+  background: rgba(132, 73, 29, 0.62);
+  color: #fbe6c6;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 }
 [data-theme="dark"] .ghost-button:hover,
 [data-theme="dark"] .theme-toggle:hover {
-  background: rgba(244, 216, 168, 0.22);
+  background: rgba(160, 92, 38, 0.8);
 }
 [data-theme="dark"] .cta-button {
   background: linear-gradient(135deg, var(--surface-strong) 0%, #b6541a 100%);
 }
 [data-theme="dark"] .filter-button.active {
-  color: #fff3df;
-  background: rgba(232, 137, 58, 0.95);
-}
-[data-theme="dark"] .filter-button:focus-visible {
-  background: rgba(232, 137, 58, 0.5);
+  color: #2a1808;
+  background: var(--filter-bg);
 }
 [data-theme="dark"] .admin-image-preview {
   color: var(--text-soft);
@@ -271,6 +305,13 @@ html,
 body {
   max-width: 100%;
   overflow-x: hidden;
+}
+/* Плавная прокрутка к якорям навигации (#order, #socials и т.д.) */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 .side-panel {
@@ -314,16 +355,20 @@ body {
   position: relative;
   padding: 40px 24px 60px;
   overflow: hidden;
-  background: linear-gradient(180deg, #fbe6b0 0%, #f7cf73 100%);
+  background: linear-gradient(180deg, #fbe6c2 0%, #f3c462 100%);
 }
 
-/* Тёплая вуаль поверх фоновой картинки шапки: жёлтый сверху → оранжевый снизу
-   (тон совпадает с верхом общего градиента страницы, без красного). */
+/* Тёплая вуаль поверх картинки шапки: лёгкая бежевая сверху и сильно затемняющая
+   К НИЗУ ОРАНЖЕВЫМ (а не жёлтым) — плавно переходит в верх страницы. */
 .hero-section::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(251, 230, 176, 0.55), rgba(243, 182, 55, 0.55) 55%, rgba(239, 157, 42, 0.6) 100%);
+  background: linear-gradient(180deg,
+    rgba(251, 230, 194, 0.10) 0%,
+    rgba(240, 187, 81, 0.18) 42%,
+    rgba(233, 142, 12, 0.44) 78%,
+    rgba(194, 85, 16, 0.64) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -380,22 +425,22 @@ body {
 .hero-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: clamp(8px, 1.2vw, 14px);
   justify-content: center;
-  margin-bottom: 32px;
+  margin-bottom: clamp(20px, 3vw, 32px);
 }
 
+/* Кнопки навигации плавно уменьшаются вместе с окном (padding/шрифт через clamp) */
 .nav-button {
-  padding: 20px 32px;
-  color: #3b2c1e;
+  padding: clamp(11px, 1.4vw, 18px) clamp(16px, 2.4vw, 30px);
   text-decoration: none;
   border-radius: 999px;
-  background: rgba(183, 78, 18, 0.96);
-  box-shadow: 0 12px 26px rgba(88, 45, 17, 0.18);
+  background: var(--nav-bg);
+  box-shadow: 0 10px 22px rgba(88, 45, 17, 0.18);
   transition: transform 0.2s ease, background 0.2s ease;
-  font-size: 1.05rem;
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
   font-weight: 600;
-  min-width: 240px;
+  min-width: clamp(150px, 18vw, 230px);
   text-align: center;
   color: #f7e2b0;
 }
@@ -403,21 +448,24 @@ body {
 .nav-button:hover,
 .nav-button:focus-visible {
   transform: translateY(-2px);
-  background: rgba(199, 98, 24, 1);
+  background: var(--nav-bg-hover);
 }
 
 .hero-title-wrap {
   display: grid;
-  gap: 18px;
+  gap: clamp(8px, 1.4vw, 18px);
   justify-items: center;
   text-align: center;
-  padding: 80px 12px 26px;
+  padding: clamp(36px, 7vw, 80px) 12px 26px;
   max-width: 100%;
   overflow: hidden;
+  /* контейнер для cqi: размер ника/подписи меряется от ШИРИНЫ этого блока,
+     поэтому текст ВСЕГДА влезает в одну строку и не обрезается на любой ширине. */
+  container-type: inline-size;
 }
 
 .hero-title {
-  font-size: var(--fs-hero);
+  font-size: min(9cqi, 3.6rem);
   line-height: 1.04;
   margin: 0;
   font-weight: 800;
@@ -425,7 +473,6 @@ body {
   position: relative;
   display: inline-block;
   max-width: 100%;
-  /* Ник всегда в одну строку, без переноса */
   white-space: nowrap;
   opacity: 1;
 }
@@ -439,22 +486,21 @@ body {
 }
 
 .hero-subtitle {
-  max-width: 900px;
   margin: 0;
-  /* Тот же шрифт, что и ник (Unbounded), чтобы подпись смотрелась с ним заодно */
+  /* Тот же шрифт И ЦВЕТ, что и ник — смотрятся единым блоком. Размер по ширине
+     контейнера (cqi), поэтому подпись всегда в ОДНУ строку и не обрезается. */
   font-family: var(--font-display);
   letter-spacing: var(--ls-display);
-  font-size: var(--fs-subtitle);
+  font-size: min(6cqi, 2rem);
   font-weight: 800;
   line-height: 1.15;
-  /* Реально заметная: насыщенный акцентный цвет + контрастная обводка-тень */
-  color: var(--surface-strong);
-  text-shadow: 0 2px 0 rgba(255, 247, 233, 0.55), 0 6px 22px rgba(191, 63, 10, 0.28);
+  color: var(--text);
+  text-shadow: 0 2px 8px rgba(81, 50, 21, 0.18);
+  white-space: nowrap;
 }
 [data-theme="dark"] .hero-subtitle {
-  /* На тёмной теме акцент светлее, иначе оранжево-красный сливается с фоном */
-  color: #ffb27a;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55), 0 0 26px rgba(255, 150, 70, 0.35);
+  color: var(--text);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .hidden {
@@ -580,42 +626,72 @@ body {
 }
 
 .admin-filter-chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
 }
 
+/* Каждый фильтр — карточка с названием на всех языках сразу */
 .admin-filter-chip {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  padding: 10px 12px;
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
   border: 1px solid rgba(112, 76, 34, 0.18);
-  border-radius: 999px;
+  border-radius: 16px;
   background: #fff6eb;
 }
 
-.admin-filter-input,
-  .admin-filter-label {
-  min-width: 120px;
-  border: none;
-  background: transparent;
+.admin-filter-chip__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-filter-chip__title {
+  font-weight: 700;
+  color: #3b2c1e;
+  font-size: 0.98rem;
+}
+
+.admin-filter-langs {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-filter-lang-row {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-filter-lang-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #6b4e30;
+}
+
+.admin-filter-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(112, 76, 34, 0.28);
+  background: #fffdf8;
+  border-radius: 10px;
+  padding: 8px 10px;
   font: inherit;
   color: #3b2c1e;
   outline: none;
 }
-
-.admin-filter-label {
-  display: inline-block;
-  min-width: 120px;
-  font-weight: 600;
+.admin-filter-input:focus {
+  border-color: var(--surface);
 }
 
-.admin-filter-delete,
-.admin-filter-toggle {
-  padding: 8px 12px;
+.admin-filter-delete {
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  flex: 0 0 auto;
 }
 
 .admin-filter-actions {
@@ -1027,39 +1103,70 @@ main {
 }
 
 .filter-button {
-  padding: 14px 18px;
-  border: 1px solid var(--card-border);
+  padding: clamp(9px, 1.1vw, 14px) clamp(12px, 1.6vw, 18px);
+  font-size: clamp(0.85rem, 1vw, 0.98rem);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  background: var(--card-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--text);
+  /* Тот же цвет, что и кнопки навигации («заказать коммишку») */
+  background: var(--nav-bg);
+  color: #f7e2b0;
   cursor: pointer;
+  font-weight: 600;
   transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
-  box-shadow: 0 12px 24px rgba(122, 68, 10, 0.12);
+  box-shadow: 0 10px 20px rgba(122, 68, 10, 0.16);
 }
 
 .filter-button:hover,
 .filter-button:focus-visible {
   transform: translateY(-2px);
-  background: rgba(255, 235, 150, 0.96);
+  background: var(--nav-bg-hover);
 }
 
+/* Активный фильтр — светлый янтарный, чтобы выделялся среди кирпичных */
 .filter-button.active {
-  background: rgba(214, 120, 38, 0.98);
-  color: #3b2c1e;
+  background: var(--filter-bg);
+  color: #4a3517;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Светлая тема: фильтры СВЕТЛЫЕ, пока не выбраны, и ТЕМНЕЮТ при нажатии (инверсия
+   относительно тёмной темы, где активный — светлый). */
+[data-theme="light"] .filter-button {
+  background: var(--field-bg);
+  color: #6a3f12;
+  border-color: rgba(161, 56, 8, 0.30);
+  box-shadow: 0 8px 18px rgba(122, 68, 10, 0.12);
+}
+[data-theme="light"] .filter-button:hover,
+[data-theme="light"] .filter-button:focus-visible {
+  background: #fffdf7;
+  border-color: rgba(161, 56, 8, 0.5);
+}
+[data-theme="light"] .filter-button.active {
+  background: var(--nav-bg);
+  color: #fff3da;
+  border-color: rgba(255, 244, 222, 0.45);
+  box-shadow: 0 12px 24px rgba(122, 68, 10, 0.28);
+}
+[data-theme="light"] .filter-button.active:hover,
+[data-theme="light"] .filter-button.active:focus-visible {
+  background: var(--nav-bg-hover);
 }
 
 .floating-gallery {
   margin-top: 36px;
   display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(10px, 1.4vw, 18px);
+  /* Ровная сетка одинаковых ячеек; ширина ячейки тянется с окном */
+  grid-template-columns: repeat(auto-fill, minmax(clamp(180px, 22vw, 240px), 1fr));
   overflow: hidden;
 }
 
+/* «Золотой стандарт» карточки: единый размер для всех работ.
+   Каждая карточка — фиксированное соотношение сторон 4:5, любое изображение
+   вписывается в него одинаково. Так разные по размеру арты не ломают сетку. */
 .art-card {
-  min-height: 240px;
+  aspect-ratio: 4 / 5;
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -1077,13 +1184,115 @@ main {
   box-shadow: 0 36px 90px rgba(88, 46, 17, 0.32);
 }
 
+/* Картинка заполняет карточку целиком, центрируется и аккуратно кадрируется.
+   Полную (необрезанную) версию показываем по клику в lightbox. */
 .art-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: transform var(--t-med) var(--ease);
 }
 
 .art-card:hover img {
   transform: scale(1.05);
 }
+
+/* Подсказка-зум при наведении */
+.art-card .art-zoom-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(20, 15, 10, 0.55);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+  pointer-events: none;
+}
+.art-card:hover .art-zoom-hint { opacity: 1; }
+.art-card .art-zoom-hint::before {
+  content: "⤢";
+  color: #fff7e9;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ----- Lightbox: полноразмерный просмотр работы ----- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 10, 6, 0.92);
+  padding: 32px;
+  animation: langOverlayIn 0.25s var(--ease) both;
+}
+.lightbox__stage {
+  position: relative;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+}
+.lightbox__stage img {
+  max-width: 96vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  /* Защита: нельзя перетащить/выделить */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+/* Водяной знак поверх увеличенной работы */
+.lightbox__watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lightbox__watermark span {
+  font-family: var(--font-hand);
+  font-size: clamp(1.4rem, 4vw, 3rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  transform: rotate(-24deg);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.lightbox__close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5001;
+  transition: background var(--t-fast) var(--ease);
+}
+.lightbox__close:hover { background: rgba(255, 255, 255, 0.3); }
 
 @keyframes cardAppear {
   to {
@@ -1396,11 +1605,12 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 130px;
-  padding: 14px 20px;
+  min-width: clamp(100px, 12vw, 130px);
+  padding: clamp(10px, 1.3vw, 14px) clamp(14px, 2vw, 20px);
+  font-size: clamp(0.9rem, 1vw, 1rem);
   border-radius: 999px;
-  background: rgba(255, 217, 105, 0.96);
-  color: #3b2c1e;
+  background: var(--filter-bg);
+  color: #3b2613;
   text-decoration: none;
   font-weight: 600;
   transition: transform 0.2s ease, background 0.2s ease;
@@ -1450,17 +1660,11 @@ main {
     padding: 24px 14px 40px;
   }
   .hero-title-wrap {
-    padding: 28px 8px 16px;
+    padding: 28px 4px 16px;
   }
-  /* На телефоне ник может не влезть в одну строку — разрешаем перенос,
-     чтобы он не вылезал за край и не «съезжал». */
+  /* Ник и подпись остаются в ОДНУ строку (размер по cqi сам ужимает текст под ширину). */
   .hero-title {
-    white-space: normal;
-    overflow-wrap: anywhere;
     line-height: 1.1;
-  }
-  .hero-subtitle {
-    font-size: clamp(1.05rem, 5.2vw, 1.6rem);
   }
 
   /* Навигация в одну колонку, кнопки на всю ширину, без огромного min-width */
@@ -1495,14 +1699,11 @@ main {
     gap: 10px;
   }
 
-  /* Галерея — одна колонка, ниже карточки */
+  /* Галерея на телефоне — ДВЕ колонки, карточки меньше (соотношение 4:5 сохраняется) */
   .floating-gallery {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin-top: 24px;
-  }
-  .art-card {
-    min-height: 220px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 22px;
   }
 
   /* Карточки/секции — меньше внутренних отступов */
@@ -1593,11 +1794,8 @@ main {
   }
 }
 
-/* На узких экранах ник может не влезать в одну строку — уменьшаем минимум */
+/* Размер ника/подписи задаётся через cqi (см. .hero-title) — здесь НЕ трогаем. */
 @media (max-width: 400px) {
-  :root {
-    --fs-hero: clamp(1.5rem, 8.5vw, 2.4rem);
-  }
   .hero-nav {
     margin-bottom: 18px;
   }
@@ -1723,21 +1921,23 @@ main {
 }
 
 .ghost-button {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--text);
+  border: 1.5px solid rgba(81, 50, 21, 0.4);
+  background: rgba(255, 247, 233, 0.94);
+  color: var(--accent);
   padding: 10px 18px;
   border-radius: var(--radius-pill);
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 10px 22px rgba(81, 50, 21, 0.22);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 .ghost-button:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.3);
+  background: #fffdf8;
+  box-shadow: 0 14px 28px rgba(81, 50, 21, 0.3);
 }
 
 /* Переключатель языка (выпадающий список) */
@@ -1791,21 +1991,23 @@ main {
 }
 
 .theme-toggle {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(81, 50, 21, 0.4);
+  background: rgba(255, 247, 233, 0.94);
   cursor: pointer;
   display: grid;
   place-items: center;
+  box-shadow: 0 10px 22px rgba(81, 50, 21, 0.22);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 .theme-toggle:hover {
   transform: translateY(-2px) rotate(12deg);
-  background: rgba(255, 255, 255, 0.3);
+  background: #fffdf8;
+  box-shadow: 0 14px 28px rgba(81, 50, 21, 0.3);
 }
 .theme-toggle__icon {
   width: 22px;
@@ -1828,7 +2030,8 @@ main {
 .cta-button {
   border: none;
   border-radius: var(--radius-pill);
-  padding: 15px 30px;
+  padding: clamp(12px, 1.5vw, 15px) clamp(20px, 3vw, 30px);
+  font-size: clamp(0.92rem, 1vw, 1rem);
   /* Тёмная часть градиента ближе к surface-strong — контраст для светлого текста */
   background: linear-gradient(135deg, var(--surface-strong) 0%, #8f2e07 100%);
   color: #fff7e9;
@@ -2166,6 +2369,26 @@ main {
   font: inherit;
 }
 
+/* Верхний выбор языка в админке — выделенный */
+.admin-lang-top {
+  background: rgba(233, 142, 12, 0.12);
+  border: 1px solid rgba(233, 142, 12, 0.4);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.admin-lang-top select {
+  width: 100%;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
 .admin-projects-list {
   display: grid;
   gap: 12px;
@@ -2238,7 +2461,32 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: center;
 }
+
+.admin-publish {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.admin-publish input {
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+}
+.admin-publish-status {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.admin-publish-status.is-info { color: var(--text-soft); }
+.admin-publish-status.is-success { color: #2f8a4a; }
+.admin-publish-status.is-error { color: #c0392b; }
+[data-theme="dark"] .admin-publish-status.is-success { color: #5fd98a; }
+[data-theme="dark"] .admin-publish-status.is-error { color: #ff8a80; }
 
 @media (max-width: 620px) {
   .admin-project-row { grid-template-columns: 1fr; }

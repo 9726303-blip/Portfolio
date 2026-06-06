@@ -49,6 +49,7 @@
             <a href="#projects" class="nav-button" data-i18n="nav_projects">мои проекты</a>
             <a href="#collab" class="nav-button" data-i18n="nav_collab">предложить сотрудничество</a>
             <a href="#about" class="nav-button" data-i18n="nav_about">обо мне</a>
+            <a href="#socials" class="nav-button" data-i18n="nav_socials">мои соцсети</a>
           </nav>
 
           <div class="hero-utility">
@@ -234,7 +235,7 @@
       </section>
     </main>
 
-      <footer class="site-footer" aria-label="Контакты и социальные сети">
+      <footer class="site-footer" id="socials" aria-label="Контакты и социальные сети">
         <div class="footer-shell">
           <p class="footer-title" data-i18n="footer_title">Следуй за мной в соцсетях</p>
           <div class="social-links">
@@ -286,6 +287,18 @@
         <button class="admin-close" id="adminClose" aria-label="Закрыть админку">×</button>
       </div>
       <form id="adminForm">
+        <div class="admin-field admin-lang-top">
+          <label for="adminTextLang">🌐 Язык, который сейчас редактирую</label>
+          <select id="adminTextLang">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="ko">한국어</option>
+          </select>
+          <p class="admin-help">Выберите язык один раз — он применяется ко всему редактированию текста и подписям постов ниже. По умолчанию — русский.</p>
+        </div>
+
         <div class="admin-field">
           <label>Редактирование изображений</label>
           <div class="admin-image-section">
@@ -318,7 +331,7 @@
             <button type="button" id="adminAddPrimaryFilter" class="admin-button">Добавить большой фильтр</button>
             <button type="button" id="adminAddSecondaryFilter" class="admin-button admin-button--secondary">Добавить малый фильтр</button>
           </div>
-          <p class="admin-help">Редактируйте фильтры как мини-кнопки. Большие идут в первой строке, малые — во второй.</p>
+          <p class="admin-help">Каждый фильтр — карточка с названием СРАЗУ на всех языках (русский, English, Español, 中文, 한국어). Большие фильтры идут в первой строке галереи, малые — во второй. «Добавить…» создаёт новую карточку: впишите названия и нажмите «Применить» или «Сохранить». Переключать язык вверху панели для этого НЕ нужно.</p>
         </div>
 
         <div class="admin-field">
@@ -338,18 +351,8 @@
 
         <div class="admin-field">
           <label>Редактирование текста</label>
-          <div class="admin-lang-switch">
-            <label for="adminTextLang">Язык, который редактируем:</label>
-            <select id="adminTextLang">
-              <option value="ru">Русский</option>
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="zh">中文</option>
-              <option value="ko">한국어</option>
-            </select>
-          </div>
           <div id="adminTextList" class="admin-text-list"></div>
-          <p class="admin-help">Выберите язык вверху и впишите текст именно для него. Текст сохраняется отдельно для каждого языка — переключите язык, чтобы задать перевод. Если поле пустое, показывается стандартный текст.</p>
+          <p class="admin-help">Текст редактируется для языка, выбранного вверху панели. Сохраняется отдельно для каждого языка. Если поле пустое — показывается стандартный текст.</p>
         </div>
 
         <div class="admin-field">
@@ -379,6 +382,12 @@
         </div>
 
         <div class="admin-field">
+          <label for="adminNtfyTopic">Push-уведомления о заявках (ntfy.sh)</label>
+          <input id="adminNtfyTopic" type="text" placeholder="Имя канала, напр. podvalnia-zayavki-7x9k" autocomplete="off" />
+          <p class="admin-help">Придумайте уникальное секретное имя канала и впишите сюда. Установите приложение <b>ntfy</b> (Android/iOS) или откройте <code>ntfy.sh</code> в браузере и подпишитесь на этот же канал. Каждая новая заявка будет приходить вам push-уведомлением. Имя держите в секрете — кто его знает, тот видит уведомления.</p>
+        </div>
+
+        <div class="admin-field">
           <label>Полученные заявки</label>
           <div id="adminOrdersList" class="admin-orders-list"></div>
           <button type="button" id="adminClearOrders" class="admin-button admin-button--secondary">Очистить заявки</button>
@@ -386,13 +395,28 @@
         </div>
 
         <div class="admin-field">
-          <label>Перенос контента на другие устройства</label>
+          <label>Опубликовать на сайт (для всех устройств)</label>
+          <div class="admin-publish">
+            <input id="adminGhOwner" type="text" placeholder="GitHub: владелец (напр. 9726303-blip)" autocomplete="off" />
+            <input id="adminGhRepo" type="text" placeholder="Репозиторий (напр. Portfolio)" autocomplete="off" />
+            <input id="adminGhBranch" type="text" placeholder="Ветка (обычно main)" autocomplete="off" />
+            <input id="adminGhToken" type="password" placeholder="GitHub-токен (хранится только тут)" autocomplete="off" />
+          </div>
           <div class="admin-io-actions">
-            <button type="button" id="adminExport" class="admin-button">Экспорт (скачать файл)</button>
-            <button type="button" id="adminImport" class="admin-button admin-button--secondary">Импорт (загрузить файл)</button>
+            <button type="button" id="adminPublish" class="admin-button">Опубликовать сейчас</button>
+            <span id="adminPublishStatus" class="admin-publish-status" aria-live="polite"></span>
+          </div>
+          <p class="admin-help">Нажмите «Опубликовать сейчас» — весь контент (галерея, проекты, тексты, соцсети) выгрузится на GitHub в файл <code>content.json</code>, и сайт обновится для ВСЕХ за 1–2 минуты. Токен вводится один раз, хранится только в этом браузере и не попадает на сайт. Как создать токен — в инструкции (нужны права «Contents: write» для этого репозитория).</p>
+        </div>
+
+        <div class="admin-field">
+          <label>Резервная копия контента (файл)</label>
+          <div class="admin-io-actions">
+            <button type="button" id="adminExport" class="admin-button admin-button--secondary">Скачать копию</button>
+            <button type="button" id="adminImport" class="admin-button admin-button--secondary">Загрузить копию</button>
             <input id="adminImportInput" type="file" accept="application/json,.json" class="hidden" />
           </div>
-          <p class="admin-help">Изменения через админку сохраняются только в этом браузере. Чтобы они появились у всех (на телефоне и у других людей), нажмите «Экспорт», скачается файл <code>portfolio-content.json</code>. Передайте его мне — я вшиваю его в сайт и публикую. «Импорт» загружает такой файл обратно в админку.</p>
+          <p class="admin-help">«Скачать копию» — сохранить весь контент в файл <code>content.json</code> на устройство (резерв или ручная заливка). «Загрузить копию» — вернуть контент из такого файла в админку.</p>
         </div>
 
         <div class="admin-field">
@@ -412,6 +436,15 @@
   </div>
 
   <input id="adminGalleryFileInput" type="file" accept="image/*" class="hidden" />
+
+  <!-- Просмотр работы в полном размере (lightbox) -->
+  <div class="lightbox hidden" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр работы">
+    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Закрыть">×</button>
+    <div class="lightbox__stage">
+      <img id="lightboxImage" alt="" draggable="false" />
+      <div class="lightbox__watermark" id="lightboxWatermark" aria-hidden="true"></div>
+    </div>
+  </div>
 
   <!-- Уведомление о защите авторских прав -->
   <div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
