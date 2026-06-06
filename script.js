@@ -1109,13 +1109,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const newFilterKeys = new Set(filters.map((f) => f.key));
     const removedKeys = Array.from(oldFilterKeys).filter((k) => !newFilterKeys.has(k));
 
-    if (removedKeys.length > 0) {
-      galleryItems.forEach((item) => {
-        const tags = (item.tags || "").split(" ").filter(Boolean);
-        item.tags = tags.filter((tag) => !removedKeys.includes(tag)).join(" ");
-      });
-    }
-
     // В galleryFilters храним только {key,label,primary}; переводы названий уходят в customTexts ниже.
     localStorage.setItem("galleryFilters", JSON.stringify(
       filters.map((f) => ({ key: f.key, label: f.label, primary: f.primary }))
@@ -1124,6 +1117,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const galleryData = collectAdminGalleryData();
     if (Array.isArray(galleryData)) {
       galleryItems = galleryData;
+    }
+    // Снимаем теги удалённых фильтров с работ ПОСЛЕ сбора галереи из DOM
+    // (если делать это раньше, collectAdminGalleryData перетрёт правку и тег-сирота останется).
+    if (removedKeys.length > 0) {
+      galleryItems.forEach((item) => {
+        const tags = (item.tags || "").split(" ").filter(Boolean);
+        item.tags = tags.filter((tag) => !removedKeys.includes(tag)).join(" ");
+      });
     }
     localStorage.setItem("galleryItems", JSON.stringify(galleryItems));
 
@@ -1793,8 +1794,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // Применить контент из объекта в localStorage и перерисовать страницу
   function applyContentPayload(data, { repopulateAdmin } = {}) {
     if (!data || data._format !== 'podvalnia-portfolio') return false;
+    // Опубликованный/импортированный контент — источник истины: что есть — пишем,
+    // чего нет (например старый content.json без прайса/контактов) — убираем, чтобы
+    // не оставался устаревший контент поверх «опубликованного».
     CONTENT_KEYS.forEach((k) => {
       if (typeof data[k] === 'string') localStorage.setItem(k, data[k]);
+      else localStorage.removeItem(k);
     });
     galleryItems = loadGalleryItems();
     projectsData = loadProjects();
@@ -1935,6 +1940,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // опубликованный контент применяем поверх localStorage только для отображения.
   async function loadPublishedContent() {
     try {
+      // На устройстве ВЛАДЕЛЬЦА (где сохранён токен публикации) НЕ тянем опубликованный
+      // content.json — иначе он перетёр бы локальную админку и несохранённые правки.
+      // Посетители (без токена) всегда видят свежий опубликованный контент.
+      const gh = loadGhConfig();
+      if (gh && gh.token) return false;
       // относительный путь — рядом с index.html в том же репозитории
       const res = await fetch('content.json?ts=' + (window.__cacheBust || ''), { cache: 'no-store' });
       if (!res.ok) return false;
@@ -2697,6 +2707,17 @@ document.addEventListener("DOMContentLoaded", function () {
   if (adminUnlock) {
     adminUnlock.addEventListener("click", openAdminPanel);
   }
+
+  // Документированные способы открыть админку: Ctrl+Shift+A или ?admin в адресе.
+  document.addEventListener("keydown", (ev) => {
+    if ((ev.ctrlKey || ev.metaKey) && ev.shiftKey && (ev.key || "").toLowerCase() === "a") {
+      ev.preventDefault();
+      openAdminPanel();
+    }
+  });
+  try {
+    if (new URLSearchParams(location.search).has("admin")) openAdminPanel();
+  } catch (e) { /* location недоступен — игнорируем */ }
 
   if (passwordSubmit) {
     passwordSubmit.addEventListener("click", () => {

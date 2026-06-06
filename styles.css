@@ -467,9 +467,12 @@ html {
 }
 
 .hero-title {
-  /* Коэффициент cqi подобран так, чтобы ник из 18 символов ВСЕГДА влезал в одну
-     строку с запасом даже на узких телефонах (раньше 9cqi обрезал на <380px). */
-  font-size: min(8cqi, 3.6rem);
+  /* Сначала vw-фоллбэк — на случай старых браузеров БЕЗ контейнерных запросов
+     (там cqi невалиден и шрифт раздулся бы); затем точный размер по ширине
+     контейнера (cqi). Коэффициент 7cqi — с запасом, чтобы ник из 18 символов
+     НИКОГДА не обрезался даже на самых узких телефонах. */
+  font-size: clamp(1rem, 5.2vw, 3.4rem);
+  font-size: min(7cqi, 3.6rem);
   line-height: 1.04;
   margin: 0;
   font-weight: 800;
@@ -495,7 +498,8 @@ html {
      контейнера (cqi), поэтому подпись всегда в ОДНУ строку и не обрезается. */
   font-family: var(--font-display);
   letter-spacing: var(--ls-display);
-  font-size: min(5.2cqi, 2rem);
+  font-size: clamp(0.95rem, 4vw, 1.8rem);
+  font-size: min(4.6cqi, 2rem);
   font-weight: 800;
   line-height: 1.2;
   color: var(--text);
@@ -1380,14 +1384,30 @@ main {
   place-items: center;
   background: rgba(0,0,0,0.35);
   z-index: 1250;
+  padding: 16px;
 }
 
 .password-modal__panel {
   background: #fffef6;
-  padding: 18px;
-  border-radius: 12px;
+  padding: 20px;
+  border-radius: 14px;
   box-shadow: var(--shadow);
-  min-width: 280px;
+  width: 100%;
+  max-width: 340px;
+}
+.password-modal__panel label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #3b2c1e;
+}
+.password-modal__panel input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(112, 76, 34, 0.3);
+  background: #fff;
 }
 
 .password-actions {
@@ -1760,19 +1780,24 @@ main {
     margin-top: 0;
   }
 
-  /* Админка на телефоне — лист во весь экран без «плавающих» полей; шапка
-     с заголовком и крестиком «прилипает» сверху при прокрутке. */
+  /* Админка на телефоне — прокручивается ВСЯ модалка (надёжнее внутреннего скролла
+     панели и не зависит от поддержки dvh), шапка с заголовком/крестиком прилипает. */
   .admin-modal {
     padding: 0;
+    display: block;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .admin-modal__panel {
     width: 100%;
     max-width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    margin-top: 0;
+    min-height: 100%;
+    height: auto;
+    max-height: none;
+    margin: 0;
     border-radius: 0;
-    padding: 0 14px 20px;
+    padding: 0 14px 28px;
+    overflow: visible;
   }
   .admin-modal__header {
     position: sticky;
@@ -1792,6 +1817,12 @@ main {
   }
   .admin-modal__header h2 {
     font-size: 1.25rem;
+  }
+  /* Кнопка админки — вниз, чтобы не перекрывать кнопки навигации сверху */
+  .admin-unlock {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
   }
   .language-modal__prompt {
     font-size: 1.05rem;
@@ -2597,7 +2628,7 @@ main {
 }
 [data-theme="dark"] .copy-template-status { color: var(--accent); }
 
-.section-examples { margin-top: 26px; }
+.section-examples { margin-top: 26px; margin-bottom: clamp(40px, 6.5vw, 68px); }
 .section-examples:has(.commission-gallery:empty) { display: none; }
 .section-examples__title {
   margin: 0 0 14px;
@@ -2740,5 +2771,27 @@ main {
   -webkit-user-select: text;
   user-select: text;
   -webkit-touch-callout: default;
+}
+/* Поля ввода — не меньше 16px, иначе мобильный Safari/Chrome зумит страницу при
+   фокусе (из-за этого приходилось «увеличивать пальцами окно ввода пароля»). */
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select,
+.password-modal input {
+  font-size: 16px;
+}
+/* На тач-устройствах НЕ применяем hover-сдвиг (иначе после тапа карточка
+   «залипает» приподнятой и выглядит съехавшей). */
+@media (hover: none) {
+  .info-card:hover,
+  .art-card:hover,
+  .commission-item:hover,
+  .nav-button:hover,
+  .cta-button:hover,
+  .section-contact__btn:hover,
+  .social-button:hover,
+  .filter-button:hover {
+    transform: none;
+  }
 }
 
