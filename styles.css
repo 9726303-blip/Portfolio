@@ -1682,8 +1682,23 @@ main {
 }
 
 @media (max-width: 760px) {
+  /* Во всю ширину страницы: убираем боковые поля (и горизонтальные отступы main),
+     чтобы подложки текстовых блоков тянулись от края до края экрана. */
   .page-shell {
-    margin: 0 12px;
+    margin: 0;
+  }
+  main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .info-card,
+  .site-footer {
+    border-radius: 0;
+  }
+  /* Галерея/фильтры — лёгкий внутренний отступ, чтобы не липли к самому краю */
+  .gallery-section {
+    padding-left: 12px;
+    padding-right: 12px;
   }
   .side-panel {
     display: none;
@@ -1748,7 +1763,7 @@ main {
     padding: 22px 0;
   }
   .info-card {
-    padding: 22px 18px;
+    padding: 24px 16px;
   }
   /* Заголовки секций чуть компактнее, чтобы длинные слова влезали в карточку */
   .info-card h2,
