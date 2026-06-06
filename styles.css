@@ -183,14 +183,6 @@ body {
   background: rgba(232, 137, 58, 0.22);
   color: var(--text);
 }
-[data-theme="dark"] .social-button {
-  background: rgba(201, 122, 30, 0.9);
-  color: #fff3df;
-}
-[data-theme="dark"] .social-button:hover,
-[data-theme="dark"] .social-button:focus-visible {
-  background: rgba(232, 137, 58, 0.96);
-}
 [data-theme="dark"] .language-modal__prompt {
   color: var(--text);
 }
@@ -1627,6 +1619,88 @@ main {
   color: var(--surface-strong, #bf3f0a);
 }
 
+/* Бабл с портфолио коллеги (над соцсетями) */
+.footer-colleague {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 247, 233, 0.6);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 20px rgba(122, 68, 10, 0.1);
+}
+[data-theme="dark"] .footer-colleague {
+  background: rgba(244, 216, 168, 0.08);
+}
+.footer-colleague__text {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text);
+}
+.footer-colleague__btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Отдельный блок «портфолио коллеги» — той же ширины, что и карточки-подложки
+   (контейнер повторяет main: max-width 1200px + боковые поля 22px). */
+.colleague-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 6px 22px 0;
+}
+
+/* Раздел «Скидки» */
+.info-card--discounts { text-align: center; }
+.discounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+  justify-content: center;
+}
+.discounts-empty {
+  margin: 8px 0 0;
+  color: var(--text-soft);
+}
+/* Маленький виджет скидки: картинка + большая цифра % + подпись */
+.discount-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 14px;
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 24px rgba(122, 68, 10, 0.12);
+}
+.discount-card__img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+.discount-card__percent {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  line-height: 1;
+  color: var(--surface-strong);
+}
+[data-theme="dark"] .discount-card__percent { color: var(--accent); }
+.discount-card__caption {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
 .social-links {
   display: flex;
   flex-wrap: wrap;
@@ -1642,17 +1716,19 @@ main {
   padding: clamp(10px, 1.3vw, 14px) clamp(14px, 2vw, 20px);
   font-size: clamp(0.9rem, 1vw, 1rem);
   border-radius: 999px;
-  background: var(--filter-bg);
-  color: #3b2613;
+  /* Оранжевый из палитры (#e98e0c) — вместо блёклого жёлтого */
+  background: linear-gradient(135deg, #f3a32b 0%, #e1820a 100%);
+  color: #fff7e9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   text-decoration: none;
-  font-weight: 600;
-  transition: transform 0.2s ease, background 0.2s ease;
+  font-weight: 700;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .social-button:hover,
 .social-button:focus-visible {
   transform: translateY(-1px);
-  background: rgba(255, 235, 145, 0.96);
+  filter: brightness(1.07);
 }
 
 @media (min-width: 900px) {
@@ -1692,8 +1768,15 @@ main {
     padding-right: 0;
   }
   .info-card,
-  .site-footer {
+  .site-footer,
+  .footer-colleague {
     border-radius: 0;
+  }
+  /* Блок коллеги тоже во всю ширину, как карточки */
+  .colleague-section {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
   }
   /* Галерея/фильтры — лёгкий внутренний отступ, чтобы не липли к самому краю */
   .gallery-section {
@@ -2517,12 +2600,14 @@ main {
   margin-top: 6px;
 }
 
-.admin-projects-list {
+.admin-projects-list,
+.admin-discounts-list {
   display: grid;
   gap: 12px;
   margin-bottom: 10px;
 }
-.admin-project-row {
+.admin-project-row,
+.admin-discount-row {
   display: grid;
   grid-template-columns: 120px 1fr auto;
   gap: 12px;
@@ -2532,7 +2617,8 @@ main {
   border-radius: 16px;
   background: #fff9f0;
 }
-[data-theme="dark"] .admin-project-row {
+[data-theme="dark"] .admin-project-row,
+[data-theme="dark"] .admin-discount-row {
   background: var(--card-bg);
   border-color: var(--field-border);
 }
@@ -2625,7 +2711,8 @@ main {
 [data-theme="dark"] .admin-publish-status.is-error { color: #ff8a80; }
 
 @media (max-width: 620px) {
-  .admin-project-row { grid-template-columns: 1fr; }
+  .admin-project-row,
+  .admin-discount-row { grid-template-columns: 1fr; }
   .admin-project-preview { width: 100%; height: 160px; }
   .admin-social-row { grid-template-columns: 1fr; }
 }

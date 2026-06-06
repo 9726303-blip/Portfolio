@@ -54,6 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminTextLang = document.getElementById("adminTextLang");
   const adminProjectsList = document.getElementById("adminProjectsList");
   const adminAddProject = document.getElementById("adminAddProject");
+  const adminDiscountsList = document.getElementById("adminDiscountsList");
+  const adminAddDiscount = document.getElementById("adminAddDiscount");
   const adminExport = document.getElementById("adminExport");
   const adminImport = document.getElementById("adminImport");
   const adminImportInput = document.getElementById("adminImportInput");
@@ -90,12 +92,10 @@ document.addEventListener("DOMContentLoaded", function () {
   let galleryItems = [];
   // Посты раздела «Мои проекты»: [{ image, date, caption: {ru, en, ...} }]
   let projectsData = [];
+  // Скидки: [{ image, percent, caption: {ru, en, ...} }]
+  let discountsData = [];
   let galleryStartIndex = 0;
   let galleryRotationTimer = null;
-  let pendingHeaderImage = null;
-  let pendingLeftSidebarImage = null;
-  let pendingRightSidebarImage = null;
-  let uploadQueue = [];
   let filterButtons = [];
   let filterMatchMode = localStorage.getItem("filterMatchMode") === "all" ? "all" : "any";
 
@@ -124,7 +124,16 @@ document.addEventListener("DOMContentLoaded", function () {
         { key: "nav_projects", label: "Кнопка «Проекты»" },
         { key: "nav_collab", label: "Кнопка «Сотрудничество»" },
         { key: "nav_about", label: "Кнопка «Обо мне»" },
+        { key: "nav_discounts", label: "Кнопка «Скидки»" },
         { key: "nav_socials", label: "Кнопка «Мои соцсети»" },
+      ],
+    },
+    {
+      section: "Скидки",
+      fields: [
+        { key: "discounts_title", label: "Заголовок раздела" },
+        { key: "discounts_text", label: "Текст раздела", type: "area" },
+        { key: "discounts_empty", label: "Текст, когда скидок нет", type: "area" },
       ],
     },
     {
@@ -194,9 +203,20 @@ document.addEventListener("DOMContentLoaded", function () {
       ],
     },
     {
+      section: "Счётчик работ и служебные тексты",
+      fields: [
+        { key: "filter_count_one", label: "Счётчик: 1 работа (оставьте {n})" },
+        { key: "filter_count_few", label: "Счётчик: 2–4 работы (оставьте {n})" },
+        { key: "filter_count_many", label: "Счётчик: 5+ работ (оставьте {n})" },
+        { key: "copy_template_done", label: "Статус «Скопировано»" },
+      ],
+    },
+    {
       section: "Футер",
       fields: [
         { key: "footer_title", label: "Заголовок футера" },
+        { key: "colleague_text", label: "Текст про коллегу (над соцсетями)", type: "area" },
+        { key: "colleague_btn", label: "Кнопка «Портфолио коллеги»" },
         { key: "footer_copyright", label: "Копирайт", type: "area" },
         { key: "copy_warning", label: "Текст защиты от копирования", type: "area" },
       ],
@@ -578,6 +598,12 @@ document.addEventListener("DOMContentLoaded", function () {
       order_images_title: "Прайс",
       collab_images_title: "Карта сотрудничества",
       contact_dm_title: "Напишите мне в личные сообщения:",
+      colleague_text: "Также вы можете ознакомиться с портфолио моего коллеги и тоже что-нибудь у него заказать:",
+      colleague_btn: "Портфолио коллеги",
+      nav_discounts: "скидки",
+      discounts_title: "Скидки",
+      discounts_text: "Здесь появляются актуальные скидки на мои работы — следите за обновлениями.",
+      discounts_empty: "Скидок пока нет — скоро появятся.",
     },
     en: {
       order_template: "Hello! I'd like to order a commission 🎨\n\n• Name/nick: \n• Type of work: \n• Idea description: \n• References (links): \n• Budget: \n• Desired deadline: \n• How to reach me: ",
@@ -587,6 +613,12 @@ document.addEventListener("DOMContentLoaded", function () {
       order_images_title: "Price list",
       collab_images_title: "Collaboration guide",
       contact_dm_title: "Message me directly:",
+      colleague_text: "You can also check out my colleague's portfolio and order something from him too:",
+      colleague_btn: "Colleague's portfolio",
+      nav_discounts: "discounts",
+      discounts_title: "Discounts",
+      discounts_text: "Current discounts on my work appear here — stay tuned.",
+      discounts_empty: "No discounts yet — coming soon.",
     },
     es: {
       order_template: "¡Hola! Quiero encargar una comisión 🎨\n\n• Nombre/apodo: \n• Tipo de trabajo: \n• Descripción de la idea: \n• Referencias (enlaces): \n• Presupuesto: \n• Plazo deseado: \n• Cómo contactarme: ",
@@ -596,6 +628,12 @@ document.addEventListener("DOMContentLoaded", function () {
       order_images_title: "Lista de precios",
       collab_images_title: "Guía de colaboración",
       contact_dm_title: "Escríbeme por privado:",
+      colleague_text: "También puedes ver el portafolio de mi colega y encargarle algo a él también:",
+      colleague_btn: "Portafolio del colega",
+      nav_discounts: "descuentos",
+      discounts_title: "Descuentos",
+      discounts_text: "Aquí aparecen los descuentos actuales en mis trabajos — atento a las novedades.",
+      discounts_empty: "Aún no hay descuentos — pronto los habrá.",
     },
     zh: {
       order_template: "你好！我想委托一幅作品 🎨\n\n• 称呼： \n• 作品类型： \n• 创意描述： \n• 参考（链接）： \n• 预算： \n• 期望完成时间： \n• 如何联系我： ",
@@ -605,6 +643,12 @@ document.addEventListener("DOMContentLoaded", function () {
       order_images_title: "价格表",
       collab_images_title: "合作方案",
       contact_dm_title: "私信联系我：",
+      colleague_text: "你也可以看看我同事的作品集，也可以向他下单：",
+      colleague_btn: "同事的作品集",
+      nav_discounts: "优惠",
+      discounts_title: "优惠",
+      discounts_text: "这里会显示我作品的当前优惠 — 敬请关注。",
+      discounts_empty: "暂无优惠 — 即将推出。",
     },
     ko: {
       order_template: "안녕하세요! 커미션을 의뢰하고 싶어요 🎨\n\n• 이름/닉네임: \n• 작업 종류: \n• 아이디어 설명: \n• 레퍼런스(링크): \n• 예산: \n• 희망 마감일: \n• 연락 방법: ",
@@ -614,6 +658,12 @@ document.addEventListener("DOMContentLoaded", function () {
       order_images_title: "가격표",
       collab_images_title: "협업 안내",
       contact_dm_title: "개인 메시지로 연락주세요:",
+      colleague_text: "제 동료의 포트폴리오도 둘러보고 그에게도 의뢰하실 수 있어요:",
+      colleague_btn: "동료의 포트폴리오",
+      nav_discounts: "할인",
+      discounts_title: "할인",
+      discounts_text: "제 작업에 대한 현재 할인 정보가 여기에 표시됩니다 — 기대해 주세요.",
+      discounts_empty: "아직 할인이 없습니다 — 곧 제공됩니다.",
     },
   };
   SUPPORTED_LANGS.forEach((lang) => {
@@ -653,7 +703,9 @@ document.addEventListener("DOMContentLoaded", function () {
     try { renderSocialLinks(); } catch (e) { console.error('social render error', e); }
     try { renderSectionImagesPublic(); } catch (e) { console.error('section images error', e); }
     try { renderContactLinksPublic(); } catch (e) { console.error('contact links error', e); }
+    try { applyColleagueLink(); } catch (e) { console.error('colleague link error', e); }
     try { renderProjectsFeed(); } catch (e) { console.error('projects feed error', e); }
+    try { renderDiscounts(); } catch (e) { console.error('discounts error', e); }
   }
 
   // Лениво подгружаем CJK/корейские шрифты только при выборе zh/ko (они тяжёлые).
@@ -755,6 +807,7 @@ document.addEventListener("DOMContentLoaded", function () {
       galleryContainer.appendChild(empty);
       return;
     }
+    const wm = loadWatermarkSettings(); // читаем один раз на всю отрисовку (а не на каждую карточку)
     const count = Math.min(8, items.length);
     for (let i = 0; i < count; i++) {
       const item = items[(startIndex + i) % items.length];
@@ -765,11 +818,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const img = document.createElement("img");
         img.src = item.image;
         img.alt = item.alt || "gallery item";
+        img.loading = "lazy";
+        img.decoding = "async";
         img.draggable = false; // запрет перетаскивания
         card.appendChild(img);
 
         // Водяной знак (если включён в админке)
-        const wm = loadWatermarkSettings();
         if (wm.enabled) {
           const watermark = document.createElement("div");
           watermark.className = "art-watermark";
@@ -906,6 +960,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function rotateGallery() {
+    // Не перестраиваем галерею, когда вкладка скрыта — экономим CPU/батарею на телефоне.
+    if (document.hidden) return;
     const items = getFilteredGalleryItems();
     if (items.length === 0) {
       renderGallery(items);
@@ -1094,8 +1150,10 @@ document.addEventListener("DOMContentLoaded", function () {
     renderAdminTextList();
     renderAdminSocialList();
     renderAdminProjectsList();
+    renderAdminDiscountsList();
     renderAdminSectionImagesAll();
     populateContactLinkFields();
+    populateColleagueField();
     populateWatermarkFields();
     populateGhFields();
   }
@@ -1181,8 +1239,15 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem('projects', JSON.stringify(projectsData));
     } catch (e) { console.warn('save projects failed', e); }
 
+    // Скидки
+    try {
+      discountsData = collectAdminDiscounts();
+      localStorage.setItem('discounts', JSON.stringify(discountsData));
+    } catch (e) { console.warn('save discounts failed', e); }
+
     try { saveWatermarkSettings(); } catch (e) { console.warn('save watermark failed', e); }
     try { saveContactLinks(); } catch (e) { console.warn('save contact links failed', e); }
+    try { saveColleagueUrl(); } catch (e) { console.warn('save colleague url failed', e); }
 
     if (adminNewPassword) adminNewPassword.value = '';
     if (adminConfirmPassword) adminConfirmPassword.value = '';
@@ -1533,11 +1598,38 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminContactDiscord = document.getElementById('adminContactDiscord');
   const adminContactVk = document.getElementById('adminContactVk');
   const adminContactTelegram = document.getElementById('adminContactTelegram');
+  const adminColleagueUrl = document.getElementById('adminColleagueUrl');
   const CONTACT_PLATFORMS = [
     { key: 'discord', label: 'Discord' },
     { key: 'vk', label: 'VK' },
     { key: 'telegram', label: 'Telegram' },
   ];
+
+  // Ссылка на портфолио коллеги (кнопка над соцсетями). null = ни разу не меняли → дефолт;
+  // пустая строка = намеренно очистили → блок коллеги скрывается.
+  const DEFAULT_COLLEAGUE_URL = 'https://9726303-blip.github.io/Kreatur_Herre/';
+  function applyColleagueLink() {
+    const a = document.getElementById('colleagueBtn');
+    if (!a) return;
+    const section = a.closest('.colleague-section');
+    const stored = localStorage.getItem('colleagueUrl');
+    const url = (stored === null) ? DEFAULT_COLLEAGUE_URL : stored.trim();
+    if (!url) {
+      if (section) section.style.display = 'none';
+      return;
+    }
+    if (section) section.style.display = '';
+    a.href = normalizeUrl(url);
+  }
+  function populateColleagueField() {
+    if (!adminColleagueUrl) return;
+    const stored = localStorage.getItem('colleagueUrl');
+    adminColleagueUrl.value = (stored === null) ? DEFAULT_COLLEAGUE_URL : stored;
+  }
+  function saveColleagueUrl() {
+    if (!adminColleagueUrl) return;
+    localStorage.setItem('colleagueUrl', adminColleagueUrl.value.trim());
+  }
 
   function loadContactLinks() {
     try {
@@ -1772,13 +1864,172 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* =====================================================================
+   * СКИДКИ: большая цифра в %, подпись (на каждом языке) и маленькая картинка
+   * ===================================================================== */
+  function loadDiscounts() {
+    try {
+      const stored = localStorage.getItem('discounts');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) { console.warn('discounts parse error', e); }
+    return [];
+  }
+  function discountCaption(item, lang) {
+    const cap = item && item.caption ? item.caption : {};
+    if (typeof cap === 'string') return cap;
+    return cap[lang] || cap.ru || cap.en || Object.values(cap).find(Boolean) || '';
+  }
+  function formatPercent(value) {
+    const v = (value == null ? '' : String(value)).trim();
+    if (!v) return '';
+    return /%/.test(v) ? v : v + '%';
+  }
+  function renderDiscounts() {
+    const grid = document.getElementById('discountsGrid');
+    if (!grid) return;
+    const items = Array.isArray(discountsData) ? discountsData : [];
+    grid.innerHTML = '';
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'discounts-empty';
+      empty.textContent = getText('discounts_empty') || 'Скидок пока нет.';
+      grid.appendChild(empty);
+      return;
+    }
+    items.forEach((it) => {
+      const card = document.createElement('div');
+      card.className = 'discount-card';
+      if (it.image) {
+        const img = document.createElement('img');
+        img.className = 'discount-card__img';
+        img.src = it.image;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.draggable = false;
+        card.appendChild(img);
+      }
+      const pct = formatPercent(it.percent);
+      if (pct) {
+        const p = document.createElement('div');
+        p.className = 'discount-card__percent';
+        p.textContent = pct;
+        card.appendChild(p);
+      }
+      const cap = discountCaption(it, currentLanguage);
+      if (cap) {
+        const c = document.createElement('div');
+        c.className = 'discount-card__caption';
+        c.textContent = cap;
+        card.appendChild(c);
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  function renderAdminDiscountsList() {
+    if (!adminDiscountsList) return;
+    if (!adminEditLang) adminEditLang = "ru";
+    adminDiscountsList.innerHTML = '';
+    const items = Array.isArray(discountsData) ? discountsData : [];
+    items.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'admin-discount-row';
+      row.dataset.index = String(index);
+
+      const media = document.createElement('div');
+      media.className = 'admin-project-media';
+      const preview = document.createElement('div');
+      preview.className = 'admin-project-preview';
+      if (item.image) {
+        const img = document.createElement('img');
+        img.src = item.image;
+        preview.appendChild(img);
+      } else {
+        preview.textContent = 'нет фото';
+      }
+      const imgBtn = document.createElement('button');
+      imgBtn.type = 'button';
+      imgBtn.className = 'admin-button admin-button--secondary';
+      imgBtn.textContent = item.image ? 'Заменить фото' : 'Загрузить фото';
+      imgBtn.addEventListener('click', () => pickDiscountImage(index));
+      media.appendChild(preview);
+      media.appendChild(imgBtn);
+
+      const fields = document.createElement('div');
+      fields.className = 'admin-project-fields';
+
+      const pctLabel = document.createElement('label');
+      pctLabel.textContent = 'Скидка (напр. 20%)';
+      const pctInput = document.createElement('input');
+      pctInput.type = 'text';
+      pctInput.className = 'admin-discount-percent';
+      pctInput.value = item.percent != null ? String(item.percent) : '';
+
+      const capLabel = document.createElement('label');
+      capLabel.textContent = 'Подпись (' + adminEditLang.toUpperCase() + ')';
+      const capInput = document.createElement('textarea');
+      capInput.className = 'admin-discount-caption';
+      capInput.rows = 2;
+      capInput.value = (item.caption && typeof item.caption === 'object') ? (item.caption[adminEditLang] || '') : (item.caption || '');
+
+      fields.appendChild(pctLabel);
+      fields.appendChild(pctInput);
+      fields.appendChild(capLabel);
+      fields.appendChild(capInput);
+
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'admin-button admin-button--secondary admin-project-remove';
+      rm.textContent = 'Удалить скидку';
+      rm.addEventListener('click', () => {
+        discountsData = collectAdminDiscounts();
+        discountsData.splice(index, 1);
+        renderAdminDiscountsList();
+      });
+
+      row.appendChild(media);
+      row.appendChild(fields);
+      row.appendChild(rm);
+      adminDiscountsList.appendChild(row);
+    });
+  }
+
+  function collectAdminDiscounts() {
+    if (!adminDiscountsList) return Array.isArray(discountsData) ? discountsData : [];
+    const editLang = adminEditLang || currentLanguage;
+    const out = [];
+    adminDiscountsList.querySelectorAll('.admin-discount-row').forEach((row) => {
+      const index = parseInt(row.dataset.index, 10);
+      const existing = (Array.isArray(discountsData) && discountsData[index]) ? discountsData[index] : {};
+      const percent = row.querySelector('.admin-discount-percent')?.value.trim() || '';
+      const capValue = row.querySelector('.admin-discount-caption')?.value.trim() || '';
+      const caption = (existing.caption && typeof existing.caption === 'object') ? { ...existing.caption } : {};
+      caption[editLang] = capValue;
+      out.push({ image: existing.image || '', percent, caption });
+    });
+    return out;
+  }
+
+  let pendingDiscountImageIndex = null;
+  function pickDiscountImage(index) {
+    pendingDiscountImageIndex = index;
+    if (adminGalleryFileInput) {
+      adminGalleryFileInput.dataset.mode = 'discount';
+      adminGalleryFileInput.value = '';
+      adminGalleryFileInput.click();
+    }
+  }
+
+  /* =====================================================================
    * ЭКСПОРТ / ИМПОРТ всего редактируемого контента (перенос между устройствами)
    * ===================================================================== */
-  // Ключи localStorage, которые относятся к контенту (без паролей/EmailJS-ключей).
+  // Ключи localStorage, которые относятся к контенту (без паролей и настроек публикации).
   const CONTENT_KEYS = [
     'galleryItems', 'galleryFilters', 'customTexts', 'projects', 'socialLinks',
     'adminHeaderImage', 'adminLeftSidebar', 'adminRightSidebar', 'watermark',
-    'orderImages', 'collabImages', 'contactLinks',
+    'orderImages', 'collabImages', 'contactLinks', 'discounts', 'colleagueUrl',
   ];
 
   // Собрать весь контент в один объект (строки, как в localStorage)
@@ -1803,6 +2054,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     galleryItems = loadGalleryItems();
     projectsData = loadProjects();
+    discountsData = loadDiscounts();
     const ct = JSON.parse(localStorage.getItem('customTexts') || '{}');
     Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
     Object.assign(customTextStore, ct);
@@ -2333,6 +2585,21 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Режим «скидка»: маленькая картинка к скидке (сильнее сжимаем — она небольшая)
+    if (mode === 'discount') {
+      compressImageFile(file, 800, 0.82).then((dataUrl) => {
+        discountsData = collectAdminDiscounts();
+        const idx = pendingDiscountImageIndex;
+        if (idx != null && discountsData[idx]) {
+          discountsData[idx].image = dataUrl;
+        }
+        pendingDiscountImageIndex = null;
+        resetInput();
+        renderAdminDiscountsList();
+      }).catch((e) => { console.warn('discount image failed', e); resetInput(); });
+      return;
+    }
+
     // Режимы «примеры работ» в блоках Заказать/Сотрудничество (до 6, сразу в localStorage)
     if (mode === 'orderImages' || mode === 'collabImages') {
       const storageKey = mode;
@@ -2413,7 +2680,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const tag = (target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || tag === "select") return true;
     if (target.isContentEditable) return true;
-    if (target.closest && target.closest(".admin-modal, .order-form, .password-modal")) return true;
+    if (target.closest && target.closest(".admin-modal, .password-modal")) return true;
     return false;
   }
 
@@ -2655,9 +2922,11 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!customTextStore[editLang]) customTextStore[editLang] = {};
       Object.assign(customTextStore[editLang], updated);
       projectsData = collectAdminProjects();
+      discountsData = collectAdminDiscounts();
       adminEditLang = adminTextLang.value;
       renderAdminTextList();
       renderAdminProjectsList();
+      renderAdminDiscountsList();
     });
   }
 
@@ -2667,6 +2936,14 @@ document.addEventListener("DOMContentLoaded", function () {
       projectsData = collectAdminProjects();
       projectsData.push({ image: '', date: '', caption: {} });
       renderAdminProjectsList();
+    });
+  }
+
+  if (adminAddDiscount) {
+    adminAddDiscount.addEventListener('click', () => {
+      discountsData = collectAdminDiscounts();
+      discountsData.push({ image: '', percent: '', caption: {} });
+      renderAdminDiscountsList();
     });
   }
 
@@ -2761,13 +3038,14 @@ document.addEventListener("DOMContentLoaded", function () {
       // Чистим именно контентные ключи (без паролей/ключей-настроек).
       ['galleryItems','galleryFilters','customTexts','projects','socialLinks',
        'adminHeaderImage','adminLeftSidebar','adminRightSidebar','watermark',
-       'orderImages','collabImages','contactLinks'].forEach((k) => localStorage.removeItem(k));
+       'orderImages','collabImages','contactLinks','discounts','colleagueUrl'].forEach((k) => localStorage.removeItem(k));
       // Возвращаем картинки по умолчанию (как в исходном index.html)
-      if (heroBgImage) heroBgImage.src = 'IMG_1858.PNG';
+      if (heroBgImage) heroBgImage.src = 'IMG_1858.jpg';
       if (leftSidebarImage) leftSidebarImage.src = 'Полосы.JPG';
       if (rightSidebarImage) rightSidebarImage.src = 'Полосы.JPG';
       galleryItems = loadGalleryItems();
       projectsData = loadProjects();
+      discountsData = loadDiscounts();
       Object.keys(customTextStore).forEach((k) => delete customTextStore[k]);
       resetGalleryRotation();
       applyTranslations();
@@ -2791,6 +3069,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   galleryItems = loadGalleryItems();
   projectsData = loadProjects();
+  discountsData = loadDiscounts();
   resetGalleryRotation();
   applyTranslations();
   applyAdminImages();

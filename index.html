@@ -12,10 +12,14 @@
        Оставлены только реально используемые начертания; display=swap — текст виден сразу. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style"
+  <!-- Шрифты грузятся НЕблокирующе (media=print→all): текст виден сразу (display=swap),
+       а отрисовка страницы не ждёт загрузки шрифтов. -->
+  <link rel="stylesheet" media="print" onload="this.media='all'"
     href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Manrope:wght@400;600;700;800&family=Unbounded:wght@700;800&display=swap" />
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Manrope:wght@400;600;700;800&family=Unbounded:wght@700;800&display=swap" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Manrope:wght@400;600;700;800&family=Unbounded:wght@700;800&display=swap" />
+  </noscript>
 
   <link rel="stylesheet" href="styles.css" />
 
@@ -36,11 +40,11 @@
 <body>
   <div class="page-layout">
     <div class="side-panel side-panel--left" aria-hidden="true">
-      <img src="Полосы.JPG" alt="" class="side-panel-image" />
+      <img src="Полосы.JPG" alt="" class="side-panel-image" loading="lazy" decoding="async" />
     </div>
     <div class="page-shell">
       <header class="hero-section">
-        <img src="IMG_1858.PNG" alt="Обновлённая шапка" class="hero-bg-image" />
+        <img src="IMG_1858.jpg" alt="Обновлённая шапка" class="hero-bg-image" fetchpriority="high" decoding="async" />
         <div class="hero-overlay"></div>
         <div class="hero-content">
           <div class="bird" aria-hidden="true"></div>
@@ -49,6 +53,7 @@
             <a href="#projects" class="nav-button" data-i18n="nav_projects">мои проекты</a>
             <a href="#collab" class="nav-button" data-i18n="nav_collab">предложить сотрудничество</a>
             <a href="#about" class="nav-button" data-i18n="nav_about">обо мне</a>
+            <a href="#discounts" class="nav-button" data-i18n="nav_discounts">скидки</a>
             <a href="#socials" class="nav-button" data-i18n="nav_socials">мои соцсети</a>
           </nav>
 
@@ -177,7 +182,23 @@
           </ul>
         </div>
       </section>
+
+      <section class="info-section" id="discounts">
+        <div class="info-card info-card--discounts">
+          <h2 data-i18n="discounts_title">Скидки</h2>
+          <p data-i18n="discounts_text">Здесь появляются актуальные скидки на мои работы — следите за обновлениями.</p>
+          <div class="discounts-grid" id="discountsGrid" aria-label="Текущие скидки"></div>
+        </div>
+      </section>
     </main>
+
+      <!-- Портфолио коллеги — отдельным блоком (над соцсетями) -->
+      <section class="colleague-section" aria-label="Портфолио коллеги">
+        <div class="footer-colleague">
+          <p class="footer-colleague__text" data-i18n="colleague_text">Также вы можете ознакомиться с портфолио моего коллеги и тоже что-нибудь у него заказать:</p>
+          <a id="colleagueBtn" href="https://9726303-blip.github.io/Kreatur_Herre/" class="cta-button footer-colleague__btn" target="_blank" rel="noopener noreferrer" data-i18n="colleague_btn">Портфолио коллеги</a>
+        </div>
+      </section>
 
       <footer class="site-footer" id="socials" aria-label="Контакты и социальные сети">
         <div class="footer-shell">
@@ -192,7 +213,7 @@
       </footer>
     </div>
     <div class="side-panel side-panel--right" aria-hidden="true">
-      <img src="Полосы.JPG" alt="" class="side-panel-image" />
+      <img src="Полосы.JPG" alt="" class="side-panel-image" loading="lazy" decoding="async" />
     </div>
   </div>
 
@@ -294,6 +315,13 @@
         </div>
 
         <div class="admin-field">
+          <label>Скидки</label>
+          <div id="adminDiscountsList" class="admin-discounts-list"></div>
+          <button type="button" id="adminAddDiscount" class="admin-button">Добавить скидку</button>
+          <p class="admin-help">Каждая скидка — большая цифра в процентах, подпись и маленькая картинка. Подпись задаётся на каждом языке отдельно (язык выбирается в «Редактирование текста»). Сохраняется при «Применить»/«Сохранить».</p>
+        </div>
+
+        <div class="admin-field">
           <label>Редактирование текста</label>
           <div id="adminTextList" class="admin-text-list"></div>
           <p class="admin-help">Текст редактируется для языка, выбранного вверху панели. Сохраняется отдельно для каждого языка. Если поле пустое — показывается стандартный текст.</p>
@@ -314,6 +342,12 @@
             <label class="admin-contact-row"><span>Telegram</span><input id="adminContactTelegram" type="text" placeholder="Ссылка на Telegram (https://…)" autocomplete="off" /></label>
           </div>
           <p class="admin-help">Эти ссылки показываются жирной строкой «Напишите мне в личные сообщения:» внизу блоков «Заказать» и «Сотрудничество». Пустые поля просто не показываются. Вставляйте ссылку как обычно (Ctrl+V или долгий тап → «Вставить»).</p>
+        </div>
+
+        <div class="admin-field">
+          <label for="adminColleagueUrl">Ссылка на портфолио коллеги</label>
+          <input id="adminColleagueUrl" type="text" placeholder="https://… (пусто — скрыть блок коллеги)" autocomplete="off" />
+          <p class="admin-help">Адрес кнопки «Портфолио коллеги» (блок над соцсетями). Текст и подпись кнопки меняются в «Редактирование текста» → «Футер». Очистите поле, чтобы скрыть весь блок коллеги.</p>
         </div>
 
         <div class="admin-field">
