@@ -1558,6 +1558,12 @@ main {
   margin-top: 0;
   margin-bottom: 16px;
   font-size: var(--fs-h2);
+  /* Длинные слова (напр. «сотрудничество») переносятся/делятся, а не вылезают за
+     край карточки — иначе на телефоне блок «съезжал» вправо. */
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  max-width: 100%;
 }
 
 .info-card p {
@@ -1744,6 +1750,11 @@ main {
   .info-card {
     padding: 22px 18px;
   }
+  /* Заголовки секций чуть компактнее, чтобы длинные слова влезали в карточку */
+  .info-card h2,
+  .gallery-intro h2 {
+    font-size: clamp(1.5rem, 6vw, 2.1rem);
+  }
 
   /* Форма заказа — одна колонка (дублирует 620px-правило, но раньше) */
   .order-grid {
@@ -1787,7 +1798,10 @@ main {
     display: block;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
+  /* СОЛИДНЫЙ фон без размытия: backdrop-filter на sticky-шапке вызывает дрожание
+     при прокрутке на iOS Safari — поэтому панель и шапка делаем непрозрачными. */
   .admin-modal__panel {
     width: 100%;
     max-width: 100%;
@@ -1798,6 +1812,9 @@ main {
     border-radius: 0;
     padding: 0 14px 28px;
     overflow: visible;
+    background: #fbeed6;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .admin-modal__header {
     position: sticky;
@@ -1807,10 +1824,14 @@ main {
     gap: 6px;
     margin: 0 -14px 14px;
     padding: 14px 14px 12px;
-    background: var(--card-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background: #fbeed6;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border-bottom: 1px solid var(--card-border);
+  }
+  [data-theme="dark"] .admin-modal__panel,
+  [data-theme="dark"] .admin-modal__header {
+    background: #241608;
   }
   .admin-modal__header .admin-note {
     display: none;
